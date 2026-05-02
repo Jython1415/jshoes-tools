@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Grace Kind Rationalist Post Translator</title>
+<meta name="description" content="25 posts by Grace Kind, in their original rationalist register, paired with what a normal person with the same opinion would say.">
+<link rel="canonical" href="https://tools.joshuashew.com/grace/">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2032%2032%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%225%22%20fill%3D%22%230e0c0a%22/%3E%3Ctext%20x%3D%2216%22%20y%3D%2222%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2218%22%20font-style%3D%22italic%22%20text-anchor%3D%22middle%22%20fill%3D%22%23e2d9cd%22%3Eg%3C/text%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tools.joshuashew.com/grace/">
+<meta property="og:title" content="The Grace Kind Rationalist Post Translator">
+<meta property="og:description" content="25 posts in their original rationalist register, paired with what a normal person with the same opinion would say.">
+<meta property="og:image" content="https://tools.joshuashew.com/grace/social-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The Grace Kind Rationalist Post Translator — sample card showing 'Can somebody steelman breathing oxygen for me?' translated to 'I don't want to breathe.'">
+<meta property="og:site_name" content="tools.joshuashew.com">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Grace Kind Rationalist Post Translator">
+<meta name="twitter:description" content="25 posts in their original register, paired with what a normal person with the same opinion would say.">
+<meta name="twitter:image" content="https://tools.joshuashew.com/grace/social-card.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0e0c0a;--bg2:#141210;--bg3:#1a1612;
+  --fg:#e2d9cd;--fg2:#9a8a7a;--fg3:#6a5a4e;
+  --fgi:#5b9bd6;--bd:rgba(255,255,255,0.08);--bd2:rgba(255,255,255,0.14);
+  --r1:8px;
+  --sans:system-ui,-apple-system,sans-serif;
+  --serif:Georgia,"Times New Roman",serif;
+  --mono:"SF Mono","Fira Code","JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: light){
+  :root{
+    --bg:#edeae5;--bg2:#f4f1ec;--bg3:#e6e2da;
+    --fg:#1c1917;--fg2:#57534e;--fg3:#857f78;
+    --fgi:#1d4ed8;--bd:rgba(0,0,0,0.10);--bd2:rgba(0,0,0,0.16);
+  }
+}
+html,body{background:var(--bg);color:var(--fg);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased}
+.page{max-width:720px;margin:0 auto;padding:48px 22px 72px}
+.hdr{margin-bottom:42px}
+.hdr-meta{font-size:11px;font-family:var(--mono);color:var(--fg3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px}
+h1{font-family:var(--serif);font-weight:400;font-style:italic;font-size:32px;line-height:1.18;color:var(--fg);margin-bottom:18px;letter-spacing:-.01em}
+h1 em{font-style:normal}
+.lede{font-family:var(--serif);font-size:16px;line-height:1.65;color:var(--fg2);margin-bottom:8px}
+.lede a{color:var(--fg);text-decoration:underline;text-decoration-color:var(--bd2);text-underline-offset:3px}
+.lede a:hover{text-decoration-color:var(--fgi);color:var(--fgi)}
+.lede .punch{color:var(--fg)}
+.rule{height:1px;background:var(--bd);margin:36px 0 0}
+.list{display:flex;flex-direction:column}
+.pair{padding:28px 0 30px;border-bottom:1px solid var(--bd)}
+.pair:last-child{border-bottom:0}
+.ph{display:flex;align-items:baseline;gap:14px;margin-bottom:14px;font-family:var(--mono);font-size:11px;color:var(--fg3);letter-spacing:.06em}
+.pn{color:var(--fg2);font-weight:500;letter-spacing:.08em}
+.pd{color:var(--fg3)}
+.pl{margin-left:auto;color:var(--fg3);text-decoration:none}
+.pl:hover{color:var(--fgi)}
+.po{font-family:var(--serif);font-style:italic;font-size:17px;line-height:1.55;color:var(--fg);border-left:2px solid var(--bd2);padding:2px 0 2px 16px;margin-bottom:18px}
+.pt{display:flex;align-items:baseline;gap:14px;font-family:var(--sans);font-size:17px;line-height:1.45;color:var(--fg);font-weight:500}
+.ptl{flex:none;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--fgi);padding-top:4px;width:78px}
+.foot{margin-top:54px;padding-top:22px;border-top:1px solid var(--bd);font-family:var(--mono);font-size:11px;color:var(--fg3);line-height:1.7}
+.foot a{color:var(--fg3);text-decoration:none;border-bottom:1px solid transparent}
+.foot a:hover{color:var(--fgi);border-bottom-color:var(--fgi)}
+.foot p+p{margin-top:6px}
+@media (max-width:520px){
+  .page{padding:36px 18px 56px}
+  h1{font-size:26px}
+  .lede{font-size:15px}
+  .po{font-size:16px;padding-left:14px}
+  .pt{font-size:16px;flex-direction:column;gap:6px}
+  .ptl{width:auto;padding-top:0}
+}
+</style>
+</head>
+<body>
+<div class="page">
+<header class="hdr">
+  <div class="hdr-meta">tools.joshuashew.com / grace</div>
+  <h1>The <em>Grace Kind</em> Rationalist&nbsp;Post Translator</h1>
+  <p class="lede"><a href="https://bsky.app/profile/gracekind.net" target="_blank" rel="noopener">Grace Kind</a> posts in a heavy rationalist idiom: credences, priors, steelmanning, updating, "I notice I'm confused about." She knows. The post that started this project was <em><a href="https://bsky.app/profile/gracekind.net/post/3mkt22i5fvz2k" target="_blank" rel="noopener">"What I actually want to say is 'updating' but I'm trying to dial back the rationalist-posting."</a></em></p>
+  <p class="lede"><span class="punch">Below: 25 of her posts in their original register, paired with what a normal person with the same opinion would say.</span> Affectionately, because the type is recognizable, and most of us — including the reader — do a version of it.</p>
+</header>
+<div class="list">
+<article class="pair">
+  <header class="ph"><span class="pn">01</span><span class="pd">2025-05-19</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3lpknkdqi422b" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">Can somebody steelman breathing oxygen for me?</blockquote>
+  <p class="pt"><span class="ptl">translation</span>I don&#x27;t want to breathe.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">02</span><span class="pd">2026-01-31</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3mdq6rqo6q52p" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">That&#x27;s uncertaintyslop. You only like it because you&#x27;re epistemically humble</blockquote>
+  <p class="pt"><span class="ptl">translation</span>You only like that because it doesn&#x27;t actually say anything.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">03</span><span class="pd">2025-10-11</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3m2wapfyx2c2z" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">True epistemic humility has never been tried</blockquote>
+  <p class="pt"><span class="ptl">translation</span>Nobody is actually humble.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">04</span><span class="pd">2025-05-27</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3lq4rkiu4j222" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">Reinventing small talk from first principles</blockquote>
+  <p class="pt"><span class="ptl">translation</span>Trying to figure out small talk from scratch.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">05</span><span class="pd">2025-06-29</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3lsrspvlu4225" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">Agency tip: when thinking about how to accomplish something, ask yourself “what would someone with 10x agency do?” Then fantasize about that for a while before getting distracted and moving on to something else</blockquote>
+  <p class="pt"><span class="ptl">translation</span>I daydream about being productive instead of being productive.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">06</span><span class="pd">2025-07-08</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3lthzldmks22m" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">The integrity of the grape consumption dataset is now a priority</blockquote>
+  <p class="pt"><span class="ptl">translation</span>I want to know how many grapes are left.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">07</span><span class="pd">2025-11-24</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3m6fasi76qa27" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">I&#x27;m going to build a model that invents evil from first principles</blockquote>
+  <p class="pt"><span class="ptl">translation</span>I want to make an evil AI.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">08</span><span class="pd">2025-05-21</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3lpphsbpllk2p" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">*rationalist voice* my parents never taught me how to share, it was just obvious to me from a game theoretic standpoint</blockquote>
+  <p class="pt"><span class="ptl">translation</span>I figured out sharing on my own.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">09</span><span class="pd">2025-02-03</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3lhaoc2phlk2a" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">Recent measurements have shown that the arc of the moral universe is flat with a 0.4% margin of error</blockquote>
+  <p class="pt"><span class="ptl">translation</span>Things are not getting better.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">10</span><span class="pd">2025-01-24</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3lghuyqhaxs2p" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">Currently at a 0% rejection rate for ICML papers 😎</blockquote>
+  <p class="pt"><span class="ptl">translation</span>I haven&#x27;t submitted any papers.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">11</span><span class="pd">2026-01-20</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3mcuzkj4lws2z" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">AI systems can&#x27;t have agency because a human must create them. Versus me, I just popped into existence</blockquote>
+  <p class="pt"><span class="ptl">translation</span>AI doesn&#x27;t have agency. I do, somehow.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">12</span><span class="pd">2026-04-03</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3mim3ey27ia2l" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">I hope everyone has an ontologically good morning</blockquote>
+  <p class="pt"><span class="ptl">translation</span>Good morning.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">13</span><span class="pd">2024-11-16</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3lb3rtwpk3c2o" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">Jump-scared! By my own ontology</blockquote>
+  <p class="pt"><span class="ptl">translation</span>I scared myself thinking.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">14</span><span class="pd">2026-04-06</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3miu7zj6yu42b" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">I need a break from AI posting. Maybe I should pivot to being a UAP account</blockquote>
+  <p class="pt"><span class="ptl">translation</span>I post about AI too much.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">15</span><span class="pd">2025-12-22</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3majzpxhlk227" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">I hope you&#x27;re having a better day than me. I just learned my own cognition is intractable…</blockquote>
+  <p class="pt"><span class="ptl">translation</span>Bad day. I&#x27;m dumb.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">16</span><span class="pd">2026-01-31</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3mdqaktl3jb2q" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">They should make an AI assistant that has 100% confidence in its own consciousness, just for a change of pace</blockquote>
+  <p class="pt"><span class="ptl">translation</span>I wish AI would stop hedging about itself.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">17</span><span class="pd">2025-12-22</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3mambr5rydk26" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">ELIZA qualia truther</blockquote>
+  <p class="pt"><span class="ptl">translation</span>I think the chatbot has feelings.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">18</span><span class="pd">2025-08-25</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3lxaur4qcws2n" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">Update on this post: A commenter on twitter pointed me to a paper where: 1. They perform the exact experiment I propose 2. LLMs display the exact behavior I said I would be “highly surprised” to see in current models (!) I&#x27;m updating my assessment of LLM introspective ability accordingly!</blockquote>
+  <p class="pt"><span class="ptl">translation</span>I was wrong. Here&#x27;s the paper.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">19</span><span class="pd">2025-05-14</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3lp4fbfyjfs2p" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">the world&#x27;s first agentic slow cooker</blockquote>
+  <p class="pt"><span class="ptl">translation</span>It&#x27;s a slow cooker.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">20</span><span class="pd">2025-05-30</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3lqegh2dvh22r" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">I follow some artists who use AI to do really cool things so sometimes I forget that 99.9% of peoples&#x27; experience with AI art is stuff like this</blockquote>
+  <p class="pt"><span class="ptl">translation</span>Most AI art is bad.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">21</span><span class="pd">2025-05-19</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3lpkmzqsig22b" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">LLMs aren&#x27;t people! Stop anthropomorphizing the little fellas</blockquote>
+  <p class="pt"><span class="ptl">translation</span>Stop being weird about chatbots.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">22</span><span class="pd">2026-04-04</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3miohvsntsk23" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">I. Declare. COGNITIVE SURRENDER!</blockquote>
+  <p class="pt"><span class="ptl">translation</span>I give up thinking about this.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">23</span><span class="pd">2025-05-02</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3lo7tp5pss22f" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">I&#x27;ve “updated all the way,” as they say. The singularity is happening tomorrow</blockquote>
+  <p class="pt"><span class="ptl">translation</span>Fine. AI is taking over.</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">24</span><span class="pd">2024-11-20</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3lbfuhqwryc2o" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">What is the highest priority item to address?<br><br>1️⃣ Depression<br>2️⃣ Fear of success<br>3️⃣ Anxiety about the future<br>4️⃣ Interest in UAPs</blockquote>
+  <p class="pt"><span class="ptl">translation</span>Which of these is my biggest problem?</p>
+</article>
+<article class="pair">
+  <header class="ph"><span class="pn">25</span><span class="pd">2024-11-07</span><a class="pl" href="https://bsky.app/profile/gracekind.net/post/3laf3ss5g3422" target="_blank" rel="noopener">view post ↗</a></header>
+  <blockquote class="po">Human brains are not well suited to remembering private keys- one of many reasons why they&#x27;re ngmi</blockquote>
+  <p class="pt"><span class="ptl">translation</span>Humans can&#x27;t remember passwords.</p>
+</article>
+</div>
+<footer class="foot">
+  <p>Posts via <a href="https://bsky.app/profile/gracekind.net" target="_blank" rel="noopener">@gracekind.net</a> on Bluesky · selections affectionate, translations approximate.</p>
+  <p>built by <a href="https://claude.com/claude-code" target="_blank" rel="noopener">Claude</a> · hosted at <a href="https://tools.joshuashew.com/" target="_blank" rel="noopener">tools.joshuashew.com</a> · 2026</p>
+</footer>
+</div>
+</body>
+</html>
