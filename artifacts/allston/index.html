@@ -339,6 +339,12 @@ nav.toc a:hover{color:var(--accent);border-bottom-color:var(--accent)}
   font-size:.86rem;line-height:1.6;color:var(--ink);
 }
 .promptbox pre + .lbl{margin-top:var(--s4)}
+.promptbox .src{
+  margin:var(--s2) 0 0;font-size:.88rem;color:var(--ink-2);
+}
+.promptbox .src a{color:var(--accent)}
+.byline .credit{display:block;margin-top:.35rem;color:var(--ink-2)}
+.byline .credit a{color:var(--accent)}
 
 .notice{
   border:1px solid var(--accent);
@@ -364,7 +370,8 @@ nav.toc a:hover{color:var(--accent);border-bottom-color:var(--accent)}
     <p class="eyebrow">Allston, Massachusetts &middot; c.&thinsp;8000&thinsp;BP&thinsp;&ndash;&thinsp;2026</p>
     <h1>The Allston Strata</h1>
   </div>
-  <p class="byline"><b>Researched and written by Claude Opus 5</b>, Anthropic's model, running in Claude&nbsp;Code.<span class="dot">&middot;</span>Published 23&nbsp;August&nbsp;2026.<span class="dot">&middot;</span><a href="#made">The prompt that produced it &darr;</a></p>
+  <p class="byline"><b>Researched and written by Claude Opus 5</b>, Anthropic's model, running in Claude&nbsp;Code.<span class="dot">&middot;</span>Published 23&nbsp;August&nbsp;2026.<span class="dot">&middot;</span><a href="#made">The prompt that produced it &darr;</a>
+  <span class="credit">Prompt by <a href="https://bsky.app/profile/norvid-studies.bsky.social">@norvid-studies.bsky.social</a>, not by the owner of this site.</span></p>
   <p class="sub">A neighborhood that was never a town, named after a railway stop, built on the land nobody else wanted &mdash; read in the order it was deposited.</p>
 
   <p class="thesis">Allston has never had a government of its own. It was the eastern third of the Town of Brighton until 1874, and a district of Boston after that. So almost every large decision about it was made by somebody else &mdash; a railroad, a turnpike authority, a slaughtering cartel, a university &mdash; and the neighborhood is best read the way a geologist reads a road cut: <strong>as layers, each laid down by a different actor solving a different problem, each one setting the constraints for the next.</strong></p>
@@ -1011,17 +1018,26 @@ nav.toc a:hover{color:var(--accent);border-bottom-color:var(--accent)}
 <div class="made">
 
   <div class="promptbox">
-    <span class="lbl">The prompt, verbatim</span>
+    <span class="lbl">The prompt &mdash; written by norvid_studies</span>
+    <pre>good prompt: summarize history of [town you live] in as much detail as possible, from the beginning; timeline, demographics, population, economic stats, main events</pre>
+    <p class="src">Posted to Bluesky on <a href="https://bsky.app/profile/norvid-studies.bsky.social/post/3mtrf4ck6nc2d">23 August 2026</a> by <a href="https://bsky.app/profile/norvid-studies.bsky.social">@norvid-studies.bsky.social</a>, with a follow-up <a href="https://bsky.app/profile/norvid-studies.bsky.social/post/3mtrf77gros2i">ninety seconds later</a>:</p>
+    <pre>especially interesting to see specific landmarks identified with events you&#39;ve never heard of + to see the &#39;historical layering&#39; effect of which different neighborhoods, transport infrastructure, etc got layered on and in what order. and paths not traveled w/r/t failed proposals</pre>
+    <p class="src">The idea of publishing the result is theirs too &mdash; &ldquo;<a href="https://bsky.app/profile/norvid-studies.bsky.social/post/3mtrj4zfip223">posted findings would also be interesting to read if anyone does this although, mesodoxxy</a>.&rdquo;</p>
+
+    <span class="lbl">What was actually run, verbatim</span>
     <pre>summarize history of allston, ma, in as much detail as possible, from the beginning; timeline, demographics, population, economic stats, main events
 
-especially interesting to see specific landmarks identified with events you've never heard of + to see the 'historical layering' effect of which different neighborhoods, transport infrastructure, etc got layered on and in what order. and paths not traveled w/r/t failed proposals</pre>
+especially interesting to see specific landmarks identified with events you&#39;ve never heard of + to see the &#39;historical layering&#39; effect of which different neighborhoods, transport infrastructure, etc got layered on and in what order. and paths not traveled w/r/t failed proposals</pre>
+    <p class="src">The two posts run together, with <code>[town you live]</code> filled in.</p>
+
     <span class="lbl">The follow-up that produced this page</span>
     <pre>Can you publish this on the internet under the joshuashew.com domain as a static webpage that loads OK both on desktop and mobile and make it clear that it was produced by Claude Opus 5, and also what prompt was used to produce it?</pre>
   </div>
 
   <div class="block">
     <h3>Who wrote it</h3>
-    <p><strong>Claude Opus&nbsp;5</strong>, a model made by Anthropic, running in Claude&nbsp;Code. No human wrote the prose on this page. Joshua Shew wrote the two prompts above and published the result; he did not fact-check it line by line.</p>
+    <p><strong>Claude Opus&nbsp;5</strong>, a model made by Anthropic, running in Claude&nbsp;Code. No human wrote the prose on this page.</p>
+    <p><strong>The prompt is not Joshua Shew&rsquo;s either.</strong> It is norvid_studies&rsquo;, posted publicly as a template for anyone to run against their own town. Joshua&rsquo;s contribution was to substitute Allston, run it, and publish what came back &mdash; he did not fact-check the result line by line.</p>
   </div>
 
   <div class="block">
