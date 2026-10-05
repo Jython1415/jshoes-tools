@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Margin notes</title>
+<meta name="description" content="One person's Margin highlights and notes on one web page, read live from their AT Protocol repository.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2032%2032%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%225%22%20fill%3D%22%23E7EAE5%22/%3E%3Crect%20x%3D%226%22%20y%3D%225%22%20width%3D%223%22%20height%3D%2222%22%20fill%3D%22%23B4553E%22/%3E%3Crect%20x%3D%2213%22%20y%3D%228%22%20width%3D%2213%22%20height%3D%223%22%20fill%3D%22%23565C59%22/%3E%3Crect%20x%3D%2213%22%20y%3D%2214%22%20width%3D%2213%22%20height%3D%223%22%20fill%3D%22%23B0801F%22/%3E%3Crect%20x%3D%2213%22%20y%3D%2220%22%20width%3D%229%22%20height%3D%223%22%20fill%3D%22%23565C59%22/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --paper:#E7EAE5; --surface:#F2F4F0; --ink:#161D1F; --ink-2:#4F5B58; --ink-3:#6A7571;
+  --rule:#C4CCC2; --rule-soft:#D5DBD2; --brick:#B4553E; --stone:#4F7189; --marsh:#557044; --ochre:#B0801F;
+  --mark:#F3E3B5;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#12171A; --surface:#1A2024; --ink:#E2E7E3; --ink-2:#A3AFAB; --ink-3:#8A9591;
+    --rule:#333C40; --rule-soft:#283034; --brick:#DB7A61; --stone:#7FA6C0; --marsh:#84A870; --ochre:#D2A24A;
+    --mark:#3A3420;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#12171A; --surface:#1A2024; --ink:#E2E7E3; --ink-2:#A3AFAB; --ink-3:#8A9591;
+  --rule:#333C40; --rule-soft:#283034; --brick:#DB7A61; --stone:#7FA6C0; --marsh:#84A870; --ochre:#D2A24A;
+  --mark:#3A3420;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Source Serif 4",Georgia,serif;font-size:17px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:720px;margin:0 auto;padding:clamp(2.4rem,7vw,4.5rem) 1rem 4rem}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);font-weight:500;margin:0 0 .9rem}
+.eyebrow a{color:inherit}
+h1{font-family:"Zilla Slab",Rockwell,Georgia,serif;font-weight:700;font-size:clamp(1.8rem,5.6vw,2.6rem);line-height:1.08;letter-spacing:-.015em;margin:0;overflow-wrap:anywhere}
+h1 a{color:inherit;text-decoration:none}
+h1 a:hover{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
+.src{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.74rem;color:var(--ink-3);margin:.7rem 0 0;word-break:break-all}
+.src a{color:inherit}
+.byline{display:flex;align-items:center;gap:.7rem;margin:1.4rem 0 0;color:var(--ink-2);font-size:.95rem}
+.byline img{width:36px;height:36px;border-radius:50%;background:var(--rule-soft);flex:none}
+.byline a{color:var(--ink);text-decoration:none;font-weight:600}
+.byline a:hover{text-decoration:underline}
+.byline .h{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.74rem;color:var(--ink-3);display:block}
+.rule{height:4px;display:flex;margin:1.8rem 0 0;border-radius:2px;overflow:hidden}
+.rule i{flex:1}
+.bar{display:flex;flex-wrap:wrap;gap:.5rem .9rem;align-items:center;margin:1.4rem 0 .4rem;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;color:var(--ink-3)}
+.bar .sp{flex:1}
+button,.btn{
+  font:500 .72rem/1 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.04em;
+  background:transparent;color:var(--ink-2);border:1px solid var(--rule);border-radius:3px;
+  padding:.5rem .7rem;cursor:pointer;text-decoration:none;display:inline-block;min-height:32px;
+}
+button:hover,.btn:hover{border-color:var(--stone);color:var(--ink)}
+button[aria-pressed="true"]{border-color:var(--ink-2);color:var(--ink);background:var(--surface)}
+button.primary{background:var(--brick);border-color:var(--brick);color:#FBF7F2}
+button.primary:hover{filter:brightness(1.06);color:#FBF7F2}
+:focus-visible{outline:2px solid var(--stone);outline-offset:2px}
+ol.notes{list-style:none;margin:0;padding:0}
+ol.notes>li{padding:1.5rem 0;border-bottom:1px solid var(--rule-soft)}
+ol.notes>li:last-child{border-bottom:0}
+blockquote{
+  margin:0;padding:.15rem 0 .15rem 1.1rem;border-left:4px solid var(--ochre);
+  color:var(--ink);font-size:1rem;line-height:1.62;
+}
+blockquote .ctx{color:var(--ink-3)}
+blockquote mark{background:var(--mark);color:inherit;padding:0 .08em;border-radius:2px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+blockquote a.jump{color:inherit;text-decoration:none}
+blockquote a.jump:hover mark{text-decoration:underline;text-decoration-color:var(--ink-3);text-underline-offset:3px}
+.body{margin:.9rem 0 0;font-size:1.02rem;white-space:pre-wrap;overflow-wrap:anywhere}
+.body a{color:var(--brick)}
+.meta{display:flex;flex-wrap:wrap;gap:.2rem .9rem;margin:.75rem 0 0;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.7rem;color:var(--ink-3);letter-spacing:.02em}
+.meta a{color:inherit}
+.kind{text-transform:uppercase;letter-spacing:.12em}
+.tags{display:flex;flex-wrap:wrap;gap:.35rem;margin:.6rem 0 0}
+.tags span{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.68rem;color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:.05rem .5rem}
+.status{color:var(--ink-2);font-size:.95rem;margin:2rem 0}
+.status.err{color:var(--brick)}
+form{display:grid;gap:.9rem;margin:1.6rem 0 0;background:var(--surface);border:1px solid var(--rule-soft);border-radius:3px;padding:1.1rem 1.2rem}
+label{display:grid;gap:.3rem;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.06em;color:var(--ink-2)}
+input{
+  font:400 .95rem/1.3 "IBM Plex Mono",ui-monospace,monospace;color:var(--ink);background:var(--paper);
+  border:1px solid var(--rule);border-radius:3px;padding:.6rem .7rem;width:100%;min-height:44px;
+}
+input:focus{border-color:var(--stone);outline:none}
+.out{display:flex;gap:.5rem;align-items:stretch}
+.out input{font-size:.78rem}
+.hint{font-size:.85rem;color:var(--ink-3);margin:0}
+ul.pages{list-style:none;margin:1rem 0 0;padding:0;display:flex;flex-direction:column;gap:.7rem}
+ul.pages a{display:block;background:var(--surface);border:1px solid var(--rule-soft);border-left:4px solid var(--brick);border-radius:3px;padding:.9rem 1.1rem;text-decoration:none;color:inherit}
+ul.pages a:hover{border-left-color:var(--stone)}
+ul.pages .t{font-family:"Zilla Slab",Georgia,serif;font-weight:600;font-size:1.05rem;line-height:1.3;display:block;overflow-wrap:anywhere}
+ul.pages .u{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.68rem;color:var(--ink-3);display:block;margin-top:.35rem;word-break:break-all}
+details{margin:3rem 0 0;border-top:1px solid var(--rule);padding-top:1.2rem}
+summary{cursor:pointer;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+footer{margin-top:3rem;padding-top:1.2rem;border-top:1px solid var(--rule);color:var(--ink-3);font-size:.82rem}
+footer a{color:var(--brick)}
+[hidden]{display:none !important}
+@media (max-width:520px){ body{font-size:16px} .out{flex-direction:column} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow"><a href="./">Margin notes</a></p>
+
+  <section id="view" hidden>
+    <h1 id="title"></h1>
+    <p class="src" id="src"></p>
+    <div class="byline" id="byline"></div>
+    <div class="rule"><i style="background:var(--marsh)"></i><i style="background:var(--ochre)"></i><i style="background:#565C59"></i><i style="background:var(--brick)"></i><i style="background:var(--stone)"></i></div>
+    <div class="bar" id="bar" hidden>
+      <span id="count"></span>
+      <span class="sp"></span>
+      <button type="button" id="f-all" aria-pressed="true">All</button>
+      <button type="button" id="f-notes" aria-pressed="false">Notes</button>
+      <button type="button" id="f-hl" aria-pressed="false">Highlights</button>
+      <button type="button" id="sort" title="Toggle order">Oldest first</button>
+      <button type="button" id="md">Copy Markdown</button>
+    </div>
+    <ol class="notes" id="notes"></ol>
+    <ul class="pages" id="pages"></ul>
+  </section>
+
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+
+  <section id="maker">
+    <form id="form" autocomplete="off">
+      <label>Bluesky / atproto handle or DID
+        <input id="in-h" name="h" placeholder="joshuashew.bsky.social" spellcheck="false" autocapitalize="off" required>
+      </label>
+      <label>Page URL (leave empty to list every annotated page)
+        <input id="in-url" name="url" type="url" placeholder="https://…" spellcheck="false">
+      </label>
+      <div><button type="submit" class="primary">Make link</button></div>
+      <div class="out" id="out" hidden>
+        <input id="out-link" readonly aria-label="Share link">
+        <button type="button" id="copy">Copy</button>
+      </div>
+    </form>
+  </section>
+
+  <footer>
+    <p>Read live from the author's own AT Protocol repository (records <span class="mono">at.margin.note</span>, <span class="mono">at.margin.annotation</span>, <span class="mono">at.margin.highlight</span>). Nothing is stored here. Notes made with <a href="https://margin.at">Margin</a>.</p>
+  </footer>
+</div>
+
+<script>
+"use strict";
+const COLLECTIONS = ["at.margin.note", "at.margin.annotation", "at.margin.highlight"];
+const PUBLIC_API = "https://public.api.bsky.app/xrpc";
+const $ = (id) => document.getElementById(id);
+const status = (msg, err) => { const s = $("status"); s.textContent = msg || ""; s.classList.toggle("err", !!err); };
+
+// ---------- URL identity ----------
+// Margin hashes the URL without its scheme (sha256 of "host/path"), so two
+// links to one page match when only scheme, "www.", a trailing slash, the
+// fragment or tracking parameters differ.
+function normUrl(raw) {
+  try {
+    const u = new URL(String(raw).trim());
+    let host = u.hostname.toLowerCase().replace(/^www\./, "");
+    let path = u.pathname.replace(/\/+$/, "");
+    const q = new URLSearchParams(u.search);
+    for (const k of [...q.keys()]) if (/^(utm_|fbclid$|gclid$|ref$|ref_src$|mc_)/i.test(k)) q.delete(k);
+    q.sort();
+    const qs = q.toString();
+    return host + (u.port ? ":" + u.port : "") + path + (qs ? "?" + qs : "");
+  } catch { return String(raw).trim().replace(/^[a-z]+:\/\//i, "").replace(/#.*$/, "").replace(/\/+$/, "").toLowerCase(); }
+}
+
+// ---------- identity ----------
+async function getJSON(url) {
+  const r = await fetch(url, { headers: { accept: "application/json" } });
+  if (!r.ok) { let m = ""; try { m = (await r.json()).message || ""; } catch {} throw new Error(`${r.status} ${m}`.trim()); }
+  return r.json();
+}
+async function resolveHandle(handle) {
+  try { return (await getJSON(`${PUBLIC_API}/com.atproto.identity.resolveHandle?handle=${encodeURIComponent(handle)}`)).did; }
+  catch {
+    const r = await fetch(`https://${handle}/.well-known/atproto-did`);
+    if (r.ok) { const t = (await r.text()).trim(); if (t.startsWith("did:")) return t; }
+    throw new Error(`Could not resolve the handle “${handle}”.`);
+  }
+}
+async function didDoc(did) {
+  if (did.startsWith("did:plc:")) return getJSON(`https://plc.directory/${did}`);
+  if (did.startsWith("did:web:")) return getJSON(`https://${decodeURIComponent(did.slice(8))}/.well-known/did.json`);
+  throw new Error(`Unsupported DID method: ${did}`);
+}
+async function resolveActor(input) {
+  const id = input.trim().replace(/^@/, "").replace(/^at:\/\//, "");
+  const did = id.startsWith("did:") ? id : await resolveHandle(id.toLowerCase());
+  const doc = await didDoc(did);
+  const pds = (doc.service || []).find((s) => s.id === "#atproto_pds" || s.id === `${did}#atproto_pds`);
+  if (!pds) throw new Error("That account has no PDS listed in its DID document.");
+  // The handle is only trusted when the DID document claims it back.
+  const aka = (doc.alsoKnownAs || []).find((a) => a.startsWith("at://"));
+  const handle = aka ? aka.slice(5) : null;
+  return { did, pds: pds.serviceEndpoint.replace(/\/+$/, ""), handle };
+}
+
+// ---------- records ----------
+async function listAll(pds, did, collection, onPage) {
+  const out = []; let cursor;
+  for (let i = 0; i < 200; i++) {
+    const u = `${pds}/xrpc/com.atproto.repo.listRecords?repo=${encodeURIComponent(did)}&collection=${collection}&limit=100${cursor ? "&cursor=" + encodeURIComponent(cursor) : ""}`;
+    const d = await getJSON(u);
+    out.push(...d.records); onPage && onPage(out.length);
+    if (!d.cursor || !d.records.length) break;
+    cursor = d.cursor;
+  }
+  return out;
+}
+function toItem(rec) {
+  const v = rec.value || {}, t = v.target || {}, sel = t.selector || {};
+  const col = rec.uri.split("/")[3];
+  const body = (v.body && v.body.value) || v.text || "";
+  const isHl = col === "at.margin.highlight" || v.motivation === "highlighting" || !body.trim();
+  return {
+    uri: rec.uri, col, source: t.source || "", title: t.title || "", key: normUrl(t.source || ""),
+    exact: sel.exact || "", prefix: sel.prefix || "", suffix: sel.suffix || "",
+    body, tags: v.tags || [], color: v.color || "", createdAt: v.createdAt || "", kind: isHl ? "highlight" : "note",
+  };
+}
+
+// ---------- rendering ----------
+function el(tag, attrs, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null) continue;
+    if (k === "class") n.className = v; else if (k === "text") n.textContent = v; else n.setAttribute(k, v);
+  }
+  for (const k of kids) if (k != null) n.append(k);
+  return n;
+}
+function linkify(text) {
+  const frag = document.createDocumentFragment();
+  const re = /https?:\/\/[^\s<>"')\]]+/g; let last = 0, m;
+  while ((m = re.exec(text))) {
+    frag.append(text.slice(last, m.index));
+    frag.append(el("a", { href: m[0], rel: "noopener", target: "_blank", text: m[0] }));
+    last = m.index + m[0].length;
+  }
+  frag.append(text.slice(last));
+  return frag;
+}
+// Text fragment (#:~:text=) so a click opens the article scrolled to the passage.
+function fragEnc(s) { return encodeURIComponent(s).replace(/-/g, "%2D").replace(/,/g, "%2C").replace(/&/g, "%26"); }
+function textFragmentUrl(it) {
+  const exact = it.exact.replace(/\s+/g, " ").trim(); if (!exact || !it.source) return it.source;
+  const words = exact.split(" ");
+  let core = words.length > 10 ? `${fragEnc(words.slice(0, 5).join(" "))},${fragEnc(words.slice(-5).join(" "))}` : fragEnc(exact);
+  const pw = it.prefix.replace(/\s+/g, " ").trim().split(" ").slice(-3).join(" ");
+  const sw = it.suffix.replace(/\s+/g, " ").trim().split(" ").slice(0, 3).join(" ");
+  if (pw) core = `${fragEnc(pw)}-,${core}`;
+  if (sw) core = `${core},-${fragEnc(sw)}`;
+  return it.source.replace(/#.*$/, "") + "#:~:text=" + core;
+}
+const fmtDate = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleString(undefined, { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); };
+const shortCtx = (s, fromEnd) => { const w = s.replace(/\s+/g, " ").trim().split(" "); if (w.length <= 12) return s.trim(); return fromEnd ? "… " + w.slice(-12).join(" ") : w.slice(0, 12).join(" ") + " …"; };
+
+function renderItem(it) {
+  const quote = it.exact ? el("blockquote", it.color ? { style: `border-left-color:${/^#?[0-9a-f]{3,8}$|^[a-z]+$/i.test(it.color) ? (it.color.startsWith("#") || /^[a-z]+$/i.test(it.color) ? it.color : "#" + it.color) : ""}` } : null,
+    el("a", { class: "jump", href: textFragmentUrl(it), rel: "noopener", target: "_blank", title: "Open the passage in the article" },
+      it.prefix ? el("span", { class: "ctx", text: shortCtx(it.prefix, true) + " " }) : null,
+      el("mark", { text: it.exact }),
+      it.suffix ? el("span", { class: "ctx", text: " " + shortCtx(it.suffix, false) }) : null)) : null;
+  const body = it.body.trim() ? el("p", { class: "body" }, linkify(it.body.trim())) : null;
+  const tags = it.tags.length ? el("div", { class: "tags" }, ...it.tags.map((t) => el("span", { text: "#" + t }))) : null;
+  const meta = el("div", { class: "meta" },
+    el("span", { class: "kind", text: it.kind }),
+    el("time", { datetime: it.createdAt, text: fmtDate(it.createdAt) }),
+    el("a", { href: `https://pdsls.dev/${it.uri}`, rel: "noopener", target: "_blank", title: it.uri, text: "record" }));
+  return el("li", { "data-kind": it.kind }, quote, body, tags, meta);
+}
+
+function markdown(items, ctx) {
+  const lines = [`# ${ctx.title}`, "", `<${ctx.source}>`, "", `Margin notes by @${ctx.handle || ctx.did}`, ""];
+  for (const it of items) {
+    if (it.exact) lines.push(it.exact.split("\n").map((l) => "> " + l).join("\n"));
+    if (it.body.trim()) lines.push("", it.body.trim());
+    lines.push("", "---", "");
+  }
+  return lines.join("\n");
+}
+
+// ---------- page state ----------
+const state = { items: [], filter: "all", asc: true, ctx: null };
+function draw() {
+  const list = $("notes"); list.replaceChildren();
+  let items = state.items.filter((i) => state.filter === "all" || i.kind === state.filter);
+  items = items.slice().sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1) * (state.asc ? 1 : -1));
+  items.forEach((it) => list.append(renderItem(it)));
+  const n = state.items.filter((i) => i.kind === "note").length, h = state.items.length - n;
+  $("count").textContent = `${n} note${n === 1 ? "" : "s"} · ${h} highlight${h === 1 ? "" : "s"}`;
+  $("sort").textContent = state.asc ? "Oldest first" : "Newest first";
+  for (const [id, f] of [["f-all", "all"], ["f-notes", "note"], ["f-hl", "highlight"]]) $(id).setAttribute("aria-pressed", String(state.filter === f));
+}
+$("f-all").onclick = () => { state.filter = "all"; draw(); };
+$("f-notes").onclick = () => { state.filter = "note"; draw(); };
+$("f-hl").onclick = () => { state.filter = "highlight"; draw(); };
+$("sort").onclick = () => { state.asc = !state.asc; draw(); };
+$("md").onclick = async () => {
+  const items = state.items.slice().sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
+  try { await navigator.clipboard.writeText(markdown(items, state.ctx)); $("md").textContent = "Copied"; }
+  catch { $("md").textContent = "Copy failed"; }
+  setTimeout(() => ($("md").textContent = "Copy Markdown"), 1600);
+};
+
+function shareLink(h, url) {
+  const p = new URLSearchParams(); p.set("h", h); if (url) p.set("url", url);
+  return `${location.origin}${location.pathname}?${p.toString()}`;
+}
+$("form").onsubmit = (e) => {
+  e.preventDefault();
+  const h = $("in-h").value.trim().replace(/^@/, ""), url = $("in-url").value.trim();
+  if (!h) return;
+  const link = shareLink(h, url);
+  $("out-link").value = link; $("out").hidden = false;
+  history.pushState(null, "", link); run();
+};
+$("copy").onclick = async () => {
+  try { await navigator.clipboard.writeText($("out-link").value); $("copy").textContent = "Copied"; }
+  catch { $("out-link").select(); $("copy").textContent = "Select + copy"; }
+  setTimeout(() => ($("copy").textContent = "Copy"), 1600);
+};
+window.onpopstate = () => run();
+
+async function run() {
+  const q = new URLSearchParams(location.search);
+  const h = q.get("h") || q.get("handle") || "", url = q.get("url") || "";
+  $("in-h").value = h; $("in-url").value = url;
+  $("notes").replaceChildren(); $("pages").replaceChildren(); $("bar").hidden = true;
+  if (!h) { $("view").hidden = true; $("maker").hidden = false; status(""); return; }
+  $("view").hidden = false;
+  $("maker").hidden = true;
+  $("title").textContent = ""; $("src").textContent = ""; $("byline").replaceChildren();
+  try {
+    status("Resolving account…");
+    const actor = await resolveActor(h);
+    const prof = getJSON(`${PUBLIC_API}/app.bsky.actor.getProfile?actor=${encodeURIComponent(actor.did)}`).catch(() => null);
+    const counts = {};
+    const recs = (await Promise.all(COLLECTIONS.map((c) =>
+      listAll(actor.pds, actor.did, c, (n) => { counts[c] = n; status(`Reading records… ${Object.values(counts).reduce((a, b) => a + b, 0)}`); })
+        .catch((err) => { if (/40[04]/.test(err.message)) return []; throw err; })))).flat();
+    const all = recs.map(toItem).filter((i) => i.source);
+    const p = await prof;
+    const handle = actor.handle || (p && p.handle) || actor.did;
+    $("byline").replaceChildren(
+      p && p.avatar ? el("img", { src: p.avatar, alt: "" }) : null,
+      el("span", null, el("a", { href: `https://bsky.app/profile/${actor.did}`, rel: "noopener", target: "_blank", text: (p && p.displayName) || handle }),
+        el("span", { class: "h", text: "@" + handle })));
+    state.ctx = { did: actor.did, handle };
+
+    if (!url) {
+      // Index mode: every page this person has annotated.
+      const groups = new Map();
+      for (const it of all) {
+        const g = groups.get(it.key) || { source: it.source, title: "", items: [], last: "" };
+        g.items.push(it); if (it.title && !g.title) g.title = it.title; if (it.createdAt > g.last) g.last = it.createdAt;
+        groups.set(it.key, g);
+      }
+      const sorted = [...groups.values()].sort((a, b) => (a.last < b.last ? 1 : -1));
+      $("title").textContent = "Annotated pages";
+      document.title = `Margin · @${handle}`;
+      $("src").textContent = `${sorted.length} pages · ${all.length} records`;
+      for (const g of sorted) {
+        const n = g.items.filter((i) => i.kind === "note").length;
+        $("pages").append(el("li", null, el("a", { href: shareLink(h, g.source) },
+          el("span", { class: "t", text: g.title || g.source.replace(/^https?:\/\//, "") }),
+          el("span", { class: "u", text: `${n} notes · ${g.items.length - n} highlights · ${g.source}` }))));
+      }
+      status(sorted.length ? "" : "No Margin records found for this account.");
+      return;
+    }
+
+    const key = normUrl(url);
+    state.items = all.filter((i) => i.key === key);
+    const title = (state.items.find((i) => i.title) || {}).title || url.replace(/^https?:\/\//, "");
+    const source = (state.items[0] || {}).source || url;
+    state.ctx.title = title; state.ctx.source = source;
+    document.title = `${title} · Margin notes by @${handle}`;
+    $("title").replaceChildren(el("a", { href: source, rel: "noopener", target: "_blank", text: title }));
+    $("src").replaceChildren(el("a", { href: source, rel: "noopener", target: "_blank", text: source }));
+    if (!state.items.length) { status(`@${handle} has no Margin notes or highlights on this page.`); return; }
+    $("bar").hidden = false; status(""); draw();
+  } catch (err) {
+    status(`Couldn’t load: ${err.message}`, true);
+    $("maker").hidden = false;
+  }
+}
+run();
+</script>
+</body>
+</html>
