@@ -3,6 +3,7 @@
 // preview tags are written into the HTML here, from the same public records
 // the page reads. Any failure or slow upstream serves the plain page.
 import { resolveActor, recordsFor, profile, pageInfo, normUrl, cached } from "../_lib/margin.js";
+import { titleFor, version } from "../_lib/card.js";
 
 const clip = (s, n) => { s = String(s || "").replace(/\s+/g, " ").trim(); return s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, "") + "…" : s; };
 
@@ -17,16 +18,16 @@ async function previewFor(context, h, url) {
   const page = await cached(request, context, `/__c/page/${encodeURIComponent(normUrl(url))}`, 21600, () => pageInfo(recs[0].source)).catch(() => ({}));
   const handle = actor.handle || (prof && prof.handle) || actor.did;
   const name = (prof && prof.displayName) || "@" + handle;
-  const title = (page.doc && page.doc.title) || recs.find((r) => r.title)?.title || page.title || url.replace(/^https?:\/\//, "");
-  const notes = recs.filter((r) => r.kind === "note").length, hls = recs.length - notes;
-  const first = recs.find((r) => r.kind === "note" && r.exact) || recs.find((r) => r.exact) || recs[0];
-  const counts = [notes && `${notes} annotation${notes === 1 ? "" : "s"}`, hls && `${hls} highlight${hls === 1 ? "" : "s"}`].filter(Boolean).join(", ");
-  const desc = first ? clip(`${counts}. “${clip(first.exact, 160)}”${first.body ? " — " + clip(first.body, 80) : ""}`, 280) : counts;
+  const first = (prof && prof.displayName ? prof.displayName.trim().split(/\s+/)[0] : "@" + handle);
+  const title = titleFor(recs, page, recs[0].source);
+  const n = recs.length;
+  const origin = new URL(request.url).origin;
+  const image = `${origin}/margin/card?h=${encodeURIComponent(actor.did)}&url=${encodeURIComponent(recs[0].source)}&v=${await version(recs)}`;
   return {
-    title: clip(`${name}’s notes on ${title}`, 140),
-    description: desc,
-    image: page.image || (prof && prof.avatar) || null,
-    large: !!page.image,
+    title: clip(`${title} — ${n} note${n === 1 ? "" : "s"} by ${name}`, 140),
+    description: `Highlights and annotations from margin.at, read live from ${first}’s AT Protocol repository.`,
+    image, imageAlt: clip(`${n} note${n === 1 ? "" : "s"} by ${name} on ${title}`, 200),
+    large: true,
     site: "Margin notes",
   };
 }
@@ -38,9 +39,9 @@ class Head {
     const m = (k, v, a = "property") => v ? `<meta ${a}="${k}" content="${esc(v)}">\n` : "";
     el.append(
       m("og:type", "article") + m("og:site_name", this.p.site) + m("og:url", this.u) +
-      m("og:title", this.p.title) + m("og:description", this.p.description) + m("og:image", this.p.image) +
+      m("og:title", this.p.title) + m("og:description", this.p.description) + m("og:image", this.p.image) + m("og:image:width", "1200") + m("og:image:height", "630") + m("og:image:alt", this.p.imageAlt) +
       m("twitter:card", this.p.large ? "summary_large_image" : "summary", "name") +
-      m("twitter:title", this.p.title, "name") + m("twitter:description", this.p.description, "name") + m("twitter:image", this.p.image, "name") +
+      m("twitter:title", this.p.title, "name") + m("twitter:description", this.p.description, "name") + m("twitter:image", this.p.image, "name") + m("twitter:image:alt", this.p.imageAlt, "name") +
       m("description", this.p.description, "name"),
       { html: true });
   }
