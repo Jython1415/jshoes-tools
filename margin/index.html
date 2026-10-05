@@ -138,6 +138,17 @@ input:focus{outline:none;border-color:var(--p400);box-shadow:0 0 0 3px rgb(96 16
   display:inline-flex;align-items:center;gap:8px;
 }
 .primary:hover{background:var(--p600)}
+.field{display:grid;gap:6px}
+.field>label{display:block;font-size:13px;font-weight:500;color:var(--text-2)}
+.combo{position:relative}
+.suggest{position:absolute;z-index:10;left:0;right:0;top:calc(100% + 6px);margin:0;padding:6px;list-style:none;
+  background:var(--panel);border:1px solid var(--input-border);border-radius:12px;box-shadow:0 10px 15px -3px rgb(0 0 0 / .1),0 4px 6px -4px rgb(0 0 0 / .1);max-height:320px;overflow:auto}
+.suggest li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;min-height:44px}
+.suggest li[aria-selected="true"],.suggest li:hover{background:var(--chip)}
+.suggest img,.suggest .ph{width:32px;height:32px;border-radius:50%;flex:none;background:var(--s300);object-fit:cover}
+.suggest .nm{font-weight:600;font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.suggest .hd{font-size:13px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.suggest .tx{min-width:0;display:grid}
 .out{display:flex;gap:8px}
 .out input{font-size:12px}
 .secondary{border:1px solid var(--input-border);background:var(--panel);color:var(--text);border-radius:999px;font:500 13px/1 Inter,system-ui,sans-serif;padding:0 16px;cursor:pointer;min-height:44px;white-space:nowrap}
@@ -194,11 +205,17 @@ footer code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11
   <section id="maker" class="card maker">
     <h2>Share your notes on a page</h2>
     <form id="form" autocomplete="off">
-      <label>Bluesky / atproto handle or DID
-        <input id="in-h" name="h" placeholder="joshuashew.bsky.social" spellcheck="false" autocapitalize="off" required>
-      </label>
+      <div class="field">
+        <label for="in-h">Bluesky / atproto handle or DID</label>
+        <div class="combo">
+          <input id="in-h" name="h" placeholder="alice.bsky.social" spellcheck="false" autocapitalize="off" autocorrect="off" required
+            role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="h-list">
+          <ul class="suggest" id="h-list" role="listbox" hidden></ul>
+        </div>
+      </div>
       <label>Page URL (leave empty to list every annotated page)
-        <input id="in-url" name="url" type="url" placeholder="https://…" spellcheck="false">
+        <input id="in-url" name="url" type="url" placeholder="https://example.com/article" spellcheck="false" list="url-list">
+        <datalist id="url-list"></datalist>
       </label>
       <button type="submit" class="primary">Make link</button>
       <div class="out" id="out" hidden>
@@ -221,6 +238,7 @@ const $ = (id) => document.getElementById(id);
 const status = (msg, err) => { const s = $("status"); s.textContent = msg || ""; s.classList.toggle("err", !!err); };
 
 // ---------- URL identity ----------
+// Kept in step with normUrl in functions/_lib/margin.js.
 // Margin hashes the URL without its scheme (sha256 of "host/path"), so two
 // links to one page match when only scheme, "www.", a trailing slash, the
 // fragment or tracking parameters differ.
@@ -387,24 +405,62 @@ function markdown(items, ctx) {
 }
 
 // ---------- page state ----------
-const state = { items: [], filter: "all", asc: true, ctx: null };
+const state = { items: [], filter: "all", sort: "asc", ctx: null, hasPos: false };
+const SORTS = { page: "In page order", asc: "Oldest first", desc: "Newest first" };
+// Place each quote in the article text so notes can be read in page order.
+// Exact match first (prefix breaks ties when a phrase repeats), then the
+// quote's opening or closing words, for text that differs slightly.
+const NQ = (s) => String(s || "").replace(/[\u2018\u2019\u02bc]/g, "'").replace(/[\u201c\u201d]/g, '"').replace(/[\u2010-\u2015]/g, "-").replace(/\s+/g, " ").trim().toLowerCase();
+function locate(text, it) {
+  const e = NQ(it.exact); if (!e) return null;
+  let i = text.indexOf(e);
+  if (i >= 0 && text.indexOf(e, i + 1) >= 0 && it.prefix) {
+    const pre = NQ(it.prefix).slice(-40), j = text.indexOf(pre + " " + e) >= 0 ? text.indexOf(pre + " " + e) : text.indexOf(pre + e);
+    if (j >= 0) i = j + pre.length;
+  }
+  if (i >= 0) return i;
+  const w = e.split(" ");
+  if (w.length >= 6) {
+    i = text.indexOf(w.slice(0, 6).join(" ")); if (i >= 0) return i;
+    i = text.indexOf(w.slice(-6).join(" ")); if (i >= 0) return i;
+  }
+  return null;
+}
+async function placeInPage(h, url, token) {
+  try {
+    const r = await fetch(`api/page?h=${encodeURIComponent(h)}&url=${encodeURIComponent(url)}`);
+    if (!r.ok) return;
+    const d = await r.json(); if (!d.text || token !== runToken) return;
+    const text = NQ(d.text);
+    let placed = 0;
+    for (const it of state.items) { it.pos = locate(text, it); if (it.pos != null) placed++; }
+    if (!placed) return;
+    state.hasPos = true; state.sort = "page"; state.textSource = d.textSource; draw();
+  } catch {}
+}
 function draw() {
   const list = $("notes"); list.replaceChildren();
   let items = state.items.filter((i) => state.filter === "all" || i.kind === state.filter);
-  items = items.slice().sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1) * (state.asc ? 1 : -1));
+  const byTime = (a, b) => (a.createdAt < b.createdAt ? -1 : 1);
+  if (state.sort === "page") items = items.slice().sort((a, b) => (a.pos ?? Infinity) - (b.pos ?? Infinity) || byTime(a, b));
+  else items = items.slice().sort((a, b) => byTime(a, b) * (state.sort === "asc" ? 1 : -1));
   items.forEach((it) => list.append(renderItem(it)));
   const n = state.items.filter((i) => i.kind === "note").length;
   $("n-all").textContent = state.items.length; $("n-notes").textContent = n; $("n-hl").textContent = state.items.length - n;
-  $("sort").textContent = state.asc ? "Oldest first" : "Newest first";
+  $("sort").textContent = SORTS[state.sort];
   for (const [id, f] of [["f-all", "all"], ["f-notes", "note"], ["f-hl", "highlight"]]) $(id).setAttribute("aria-pressed", String(state.filter === f));
 }
 $("f-all").onclick = () => { state.filter = "all"; draw(); };
 $("f-notes").onclick = () => { state.filter = "note"; draw(); };
 $("f-hl").onclick = () => { state.filter = "highlight"; draw(); };
-$("sort").onclick = () => { state.asc = !state.asc; draw(); };
+$("sort").onclick = () => {
+  const order = state.hasPos ? ["page", "asc", "desc"] : ["asc", "desc"];
+  state.sort = order[(order.indexOf(state.sort) + 1) % order.length]; draw();
+};
 $("ctx").onclick = () => { const on = document.body.classList.toggle("show-ctx"); $("ctx").setAttribute("aria-pressed", String(on)); };
 $("md").onclick = async () => {
-  const items = state.items.slice().sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
+  const items = state.hasPos ? state.items.slice().sort((a, b) => (a.pos ?? Infinity) - (b.pos ?? Infinity) || (a.createdAt < b.createdAt ? -1 : 1))
+    : state.items.slice().sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
   try { await navigator.clipboard.writeText(markdown(items, state.ctx)); $("md").textContent = "Copied"; }
   catch { $("md").textContent = "Copy failed"; }
   setTimeout(() => ($("md").textContent = "Copy Markdown"), 1600);
@@ -414,6 +470,71 @@ function shareLink(h, url) {
   const p = new URLSearchParams(); p.set("h", h); if (url) p.set("url", url);
   return `${location.origin}${location.pathname}?${p.toString()}`;
 }
+// ---------- handle autocomplete ----------
+// Public typeahead from the Bluesky AppView, the same lookup Bluesky's own
+// compose box uses. Arrow keys move, Enter or Tab picks, Escape closes.
+(() => {
+  const inp = $("in-h"), list = $("h-list");
+  let timer = 0, seq = 0, opts = [], active = -1;
+  const close = () => { list.hidden = true; inp.setAttribute("aria-expanded", "false"); inp.removeAttribute("aria-activedescendant"); active = -1; };
+  const mark = () => {
+    [...list.children].forEach((li, i) => li.setAttribute("aria-selected", String(i === active)));
+    if (active >= 0) { inp.setAttribute("aria-activedescendant", "h-opt-" + active); list.children[active].scrollIntoView({ block: "nearest" }); }
+  };
+  const pick = (a) => { inp.value = a.handle; close(); loadPages(a.handle); $("in-url").focus(); };
+  async function search(q) {
+    const my = ++seq;
+    try {
+      const d = await getJSON(`${PUBLIC_API}/app.bsky.actor.searchActorsTypeahead?q=${encodeURIComponent(q)}&limit=8`);
+      if (my !== seq || inp.value.trim().replace(/^@/, "") !== q) return;
+      opts = (d.actors || []).filter((a) => a.handle && a.handle !== "handle.invalid");
+      list.replaceChildren(...opts.map((a, i) => el("li", { id: "h-opt-" + i, role: "option", "aria-selected": "false" },
+        a.avatar ? el("img", { src: a.avatar, alt: "", loading: "lazy" }) : el("span", { class: "ph" }),
+        el("span", { class: "tx" }, el("span", { class: "nm", text: a.displayName || a.handle }), el("span", { class: "hd", text: "@" + a.handle })))));
+      [...list.children].forEach((li, i) => li.addEventListener("mousedown", (e) => { e.preventDefault(); pick(opts[i]); }));
+      active = -1;
+      if (opts.length) { list.hidden = false; inp.setAttribute("aria-expanded", "true"); } else close();
+    } catch { close(); }
+  }
+  inp.addEventListener("input", () => {
+    clearTimeout(timer);
+    const q = inp.value.trim().replace(/^@/, "");
+    if (!q || q.startsWith("did:")) { close(); return; }
+    timer = setTimeout(() => search(q), 150);
+  });
+  inp.addEventListener("keydown", (e) => {
+    if (list.hidden || !opts.length) return;
+    if (e.key === "ArrowDown") { e.preventDefault(); active = (active + 1) % opts.length; mark(); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); active = (active - 1 + opts.length) % opts.length; mark(); }
+    else if ((e.key === "Enter" || e.key === "Tab") && active >= 0) { e.preventDefault(); pick(opts[active]); }
+    else if (e.key === "Escape") { close(); }
+  });
+  inp.addEventListener("blur", () => setTimeout(close, 100));
+  inp.addEventListener("change", () => loadPages(inp.value));
+})();
+
+// Once a handle is known, offer the pages that person has annotated.
+let pagesFor = "";
+async function loadPages(h) {
+  h = String(h || "").trim().replace(/^@/, "");
+  if (!h || h === pagesFor) return;
+  pagesFor = h;
+  try {
+    const actor = await resolveActor(h);
+    const recs = (await Promise.all(COLLECTIONS.map((c) => listAll(actor.pds, actor.did, c).catch(() => [])))).flat();
+    if (pagesFor !== h) return;
+    const seen = new Map();
+    for (const it of recs.map(toItem)) {
+      if (!it.source) continue;
+      const g = seen.get(it.key) || { source: it.source, title: it.title, last: "" };
+      if (it.createdAt > g.last) g.last = it.createdAt; if (!g.title && it.title) g.title = it.title;
+      seen.set(it.key, g);
+    }
+    $("url-list").replaceChildren(...[...seen.values()].sort((a, b) => (a.last < b.last ? 1 : -1))
+      .map((g) => el("option", { value: g.source }, g.title || "")));
+  } catch {}
+}
+
 $("form").onsubmit = (e) => {
   e.preventDefault();
   const h = $("in-h").value.trim().replace(/^@/, ""), url = $("in-url").value.trim();
@@ -429,7 +550,10 @@ $("copy").onclick = async () => {
 };
 window.onpopstate = () => run();
 
+let runToken = 0;
 async function run() {
+  const token = ++runToken;
+  state.items = []; state.hasPos = false; state.sort = "asc";
   const q = new URLSearchParams(location.search);
   const h = q.get("h") || q.get("handle") || "", url = q.get("url") || "";
   $("in-h").value = h; $("in-url").value = url;
@@ -488,6 +612,7 @@ async function run() {
     $("src").replaceChildren(el("span", { html: ICON.link }), el("a", { href: source, rel: "noopener", target: "_blank", text: source.replace(/^https?:\/\//, "") }));
     if (!state.items.length) { status(`@${handle} has no Margin notes or highlights on this page.`); return; }
     $("bar").hidden = false; status(""); draw();
+    placeInPage(h, source, token);
   } catch (err) {
     $("notes").replaceChildren();
     status(`Couldn’t load: ${err.message}`, true);
