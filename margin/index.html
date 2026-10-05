@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Margin notes</title>
+<meta name="description" content="One person's Margin highlights and notes on one web page, read live from their AT Protocol repository.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2032%2032%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227%22%20fill%3D%22%2318181b%22/%3E%3Crect%20x%3D%228%22%20y%3D%227%22%20width%3D%223%22%20height%3D%2218%22%20rx%3D%221.5%22%20fill%3D%22%23facc15%22/%3E%3Crect%20x%3D%2214%22%20y%3D%229%22%20width%3D%2211%22%20height%3D%222.5%22%20rx%3D%221.25%22%20fill%3D%22%23fafafa%22/%3E%3Crect%20x%3D%2214%22%20y%3D%2214.75%22%20width%3D%2211%22%20height%3D%222.5%22%20rx%3D%221.25%22%20fill%3D%22%23a1a1aa%22/%3E%3Crect%20x%3D%2214%22%20y%3D%2220.5%22%20width%3D%227%22%20height%3D%222.5%22%20rx%3D%221.25%22%20fill%3D%22%23a1a1aa%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@500;600;700&display=swap">
+<style>
+/* Palette and type follow Margin's own design tokens (web/tailwind.config.mjs,
+   web/src/styles/global.css in github.com/margin-at/margin): zinc "surface"
+   scale, blue "primary", Inter body, Outfit headings. */
+:root{
+  --s50:#fafafa; --s100:#f4f4f5; --s200:#e4e4e7; --s300:#d4d4d8; --s400:#a1a1aa; --s500:#71717a;
+  --s600:#52525b; --s700:#3f3f46; --s800:#27272a; --s900:#18181b; --s950:#09090b;
+  --brand:#027bff; --p50:#eff6ff; --p100:#dbeafe; --p400:#60a5fa; --p600:#2563eb; --p900:#1e3a8a;
+
+  --page:var(--s100); --panel:#fff; --card:var(--s100); --card-border:rgb(228 228 231 / .6);
+  --text:var(--s900); --text-2:var(--s600); --text-3:var(--s400); --hair:var(--s300);
+  --link:var(--p600); --chip:var(--s200); --chip-on:#fff;
+  --q-note:var(--s300); --q-hl:#facc15; --q-hl-bg:rgb(254 252 232 / .5); --q-hover:var(--s50);
+  --input:var(--s50); --input-border:var(--s200);
+  --shadow:0 1px 2px 0 rgb(0 0 0 / .05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --page:var(--s950); --panel:var(--s900); --card:var(--s900); --card-border:var(--s800);
+    --text:var(--s50); --text-2:var(--s300); --text-3:var(--s500); --hair:var(--s600);
+    --link:var(--p400); --chip:var(--s800); --chip-on:var(--s700);
+    --q-note:var(--s600); --q-hl-bg:rgb(113 63 18 / .2); --q-hover:rgb(39 39 42 / .5);
+    --input:var(--s800); --input-border:var(--s700); --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --page:var(--s950); --panel:var(--s900); --card:var(--s900); --card-border:var(--s800);
+  --text:var(--s50); --text-2:var(--s300); --text-3:var(--s500); --hair:var(--s600);
+  --link:var(--p400); --chip:var(--s800); --chip-on:var(--s700);
+  --q-note:var(--s600); --q-hl-bg:rgb(113 63 18 / .2); --q-hover:rgb(39 39 42 / .5);
+  --input:var(--s800); --input-border:var(--s700); --shadow:none;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;background:var(--page)}
+body{
+  margin:0;background:var(--page);color:var(--text);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+}
+h1,h2,.display{font-family:Outfit,ui-sans-serif,system-ui,sans-serif;letter-spacing:-.02em}
+a{color:var(--link)}
+.shell{max-width:760px;margin:0 auto;padding:12px 12px 48px}
+.panel{background:var(--panel);border-radius:20px;padding:24px clamp(16px,4vw,40px) 32px;min-height:calc(100vh - 24px)}
+.top{display:flex;align-items:center;gap:8px;margin:0 0 20px;font-size:13px;color:var(--text-3)}
+.top a{color:inherit;text-decoration:none;font-weight:500}
+.top a:hover{color:var(--text)}
+.top .dot{color:var(--hair)}
+.card{background:var(--card);border:1px solid var(--card-border);border-radius:12px;box-shadow:var(--shadow)}
+
+/* page header card */
+.hero{padding:20px}
+.hero h1{font-size:clamp(22px,4.4vw,28px);line-height:1.15;font-weight:700;margin:0;overflow-wrap:anywhere}
+.hero h1 a{color:inherit;text-decoration:none}
+.hero h1 a:hover{text-decoration:underline;text-underline-offset:3px}
+.srcline{display:flex;align-items:center;gap:5px;margin:8px 0 0;font-size:12px;min-width:0}
+.srcline a{color:var(--link);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.srcline a:hover{text-decoration:underline}
+.srcline svg{flex:none;color:var(--link)}
+.who{display:flex;align-items:center;gap:12px;margin:16px 0 0;padding:14px 0 0;border-top:1px solid var(--card-border)}
+.who .name{font-weight:600;font-size:15px;color:var(--text);text-decoration:none}
+.who .name:hover{text-decoration:underline}
+.who .handle{color:var(--text-3);font-size:14px;overflow-wrap:anywhere}
+.avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;background:var(--s300);flex:none;display:block}
+.avatar.lg{width:48px;height:48px}
+
+/* tabs (Margin's segmented control) */
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:16px 0}
+.tabs{display:inline-flex;gap:2px;padding:4px;border-radius:10px;background:var(--chip)}
+.tabs button{border:0;background:transparent;color:var(--text-2);font:500 13px/1 Inter,system-ui,sans-serif;padding:8px 12px;border-radius:7px;cursor:pointer;min-height:32px}
+.tabs button:hover{color:var(--text)}
+.tabs button[aria-pressed="true"]{background:var(--chip-on);color:var(--text);box-shadow:var(--shadow)}
+.tabs .n{color:var(--text-3);font-weight:400;margin-left:4px}
+.toolbar .sp{flex:1}
+.ghost{border:0;background:transparent;color:var(--text-3);font:500 12px/1 Inter,system-ui,sans-serif;padding:8px 10px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;min-height:32px;text-decoration:none}
+.ghost:hover{color:var(--link);background:var(--q-hover)}
+
+/* note cards */
+ol.notes{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+article.note{padding:16px}
+.head{display:flex;align-items:center;gap:12px;min-width:0}
+.head .meta{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;min-width:0}
+.head .name{font-weight:600;font-size:15px;color:var(--text);text-decoration:none}
+.head .name:hover{text-decoration:underline}
+.head .handle,.head time{color:var(--text-3);font-size:14px}
+.head .sep{color:var(--hair)}
+.content{margin:12px 0 0 52px}
+blockquote{
+  margin:0 0 12px;padding:8px 8px 8px 16px;border-left:3px solid var(--q-note);border-radius:0 8px 8px 0;
+  font-size:15px;font-style:italic;color:var(--text-2);transition:background-color .2s ease-out;
+}
+blockquote.hl{border-left-color:var(--q-hl);background:var(--q-hl-bg)}
+blockquote:hover{background:var(--q-hover)}
+blockquote.hl:hover{background:var(--q-hl-bg)}
+blockquote a{color:inherit;text-decoration:none;display:block;overflow-wrap:anywhere}
+blockquote .ctx{display:none}
+.show-ctx blockquote .ctx{display:inline;color:var(--text-3);font-style:normal}
+.body{margin:0;color:var(--text);white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.625;font-size:15px}
+.content > :last-child{margin-bottom:0}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0}
+.tags span{padding:4px 8px;border-radius:6px;background:var(--chip);font-size:12px;font-weight:500;color:var(--text-2)}
+.actions{display:flex;align-items:center;gap:2px;margin:10px 0 0 44px}
+.badge{font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--text-3);padding:0 8px}
+
+/* index of pages */
+ul.pages{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}
+ul.pages a.card{display:block;padding:14px 16px;text-decoration:none;color:inherit}
+ul.pages a.card:hover{border-color:var(--s300)}
+ul.pages .t{font-family:Outfit,ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:16px;letter-spacing:-.01em;line-height:1.3;display:block;overflow-wrap:anywhere;color:var(--text)}
+ul.pages .u{display:block;font-size:12px;color:var(--link);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ul.pages .c{display:block;font-size:12px;color:var(--text-3);margin-top:2px}
+
+/* maker form */
+.maker{padding:20px;margin:0}
+.maker h2{font-size:20px;font-weight:600;margin:0 0 14px}
+form{display:grid;gap:14px}
+label{display:grid;gap:6px;font-size:13px;font-weight:500;color:var(--text-2)}
+input{
+  font:400 14px/1.3 Inter,system-ui,sans-serif;color:var(--text);background:var(--input);
+  border:1px solid var(--input-border);border-radius:12px;padding:10px 12px;width:100%;min-height:44px;
+}
+input::placeholder{color:var(--text-3)}
+input:focus{outline:none;border-color:var(--p400);box-shadow:0 0 0 3px rgb(96 165 250 / .2)}
+.primary{
+  justify-self:start;border:0;border-radius:999px;background:var(--brand);color:#fff;
+  font:600 14px/1 Inter,system-ui,sans-serif;padding:12px 20px;cursor:pointer;min-height:44px;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.primary:hover{background:var(--p600)}
+.field{display:grid;gap:6px}
+.field>label{display:block;font-size:13px;font-weight:500;color:var(--text-2)}
+.combo{position:relative}
+.suggest{position:absolute;z-index:10;left:0;right:0;top:calc(100% + 6px);margin:0;padding:6px;list-style:none;
+  background:var(--panel);border:1px solid var(--input-border);border-radius:12px;box-shadow:0 10px 15px -3px rgb(0 0 0 / .1),0 4px 6px -4px rgb(0 0 0 / .1);max-height:320px;overflow:auto}
+.suggest li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;min-height:44px}
+.suggest li[aria-selected="true"],.suggest li:hover{background:var(--chip)}
+.suggest img,.suggest .ph{width:32px;height:32px;border-radius:50%;flex:none;background:var(--s300);object-fit:cover}
+.suggest .nm{font-weight:600;font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.suggest .hd{font-size:13px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.suggest .tx{min-width:0;display:grid}
+.out{display:flex;gap:8px}
+.out input{font-size:12px}
+.secondary{border:1px solid var(--input-border);background:var(--panel);color:var(--text);border-radius:999px;font:500 13px/1 Inter,system-ui,sans-serif;padding:0 16px;cursor:pointer;min-height:44px;white-space:nowrap}
+.secondary:hover{background:var(--chip)}
+:focus-visible{outline:2px solid var(--p400);outline-offset:2px}
+
+.status{color:var(--text-2);font-size:14px;margin:20px 4px}
+.status.err{color:#ef4444}
+.skeleton{height:120px;border-radius:12px;background:var(--card);border:1px solid var(--card-border);animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.55}}
+footer{margin:32px 4px 0;color:var(--text-3);font-size:12px;line-height:1.6}
+footer a{color:inherit}
+footer code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px}
+[hidden]{display:none !important}
+@media (max-width:560px){
+  .shell{padding:0}
+  .panel{border-radius:0;min-height:100vh}
+  .content{margin-left:0}
+  .actions{margin-left:-8px}
+  .out{flex-direction:column}
+  .head .meta{flex-wrap:nowrap}
+  .head .handle{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+  .head .name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+}
+</style>
+</head>
+<body>
+<div class="shell"><main class="panel">
+  <nav class="top"><a href="./" class="display">Margin notes</a><span class="dot">·</span><span>notes from <a href="https://margin.at" rel="noopener">margin.at</a></span></nav>
+
+  <section id="view" hidden>
+    <div class="card hero">
+      <h1 id="title"></h1>
+      <p class="srcline" id="src"></p>
+      <div class="who" id="byline"></div>
+    </div>
+    <div class="toolbar" id="bar" hidden>
+      <div class="tabs" role="group" aria-label="Filter">
+        <button type="button" id="f-all" aria-pressed="true">All<span class="n" id="n-all"></span></button>
+        <button type="button" id="f-notes" aria-pressed="false">Annotations<span class="n" id="n-notes"></span></button>
+        <button type="button" id="f-hl" aria-pressed="false">Highlights<span class="n" id="n-hl"></span></button>
+      </div>
+      <span class="sp"></span>
+      <button type="button" class="ghost" id="ctx" aria-pressed="false">Context</button>
+      <button type="button" class="ghost" id="sort">Oldest first</button>
+      <button type="button" class="ghost" id="md">Copy Markdown</button>
+    </div>
+    <ol class="notes" id="notes"></ol>
+    <ul class="pages" id="pages"></ul>
+  </section>
+
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+
+  <section id="maker" class="card maker">
+    <h2>Share your notes on a page</h2>
+    <form id="form" autocomplete="off">
+      <div class="field">
+        <label for="in-h">Bluesky / atproto handle or DID</label>
+        <div class="combo">
+          <input id="in-h" name="h" placeholder="alice.bsky.social" spellcheck="false" autocapitalize="off" autocorrect="off" required
+            role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="h-list">
+          <ul class="suggest" id="h-list" role="listbox" hidden></ul>
+        </div>
+      </div>
+      <label>Page URL (leave empty to list every annotated page)
+        <input id="in-url" name="url" type="url" placeholder="https://example.com/article" spellcheck="false" list="url-list">
+        <datalist id="url-list"></datalist>
+      </label>
+      <button type="submit" class="primary">Make link</button>
+      <div class="out" id="out" hidden>
+        <input id="out-link" readonly aria-label="Share link">
+        <button type="button" class="secondary" id="copy">Copy</button>
+      </div>
+    </form>
+  </section>
+
+  <footer>
+    Read live from the author's own AT Protocol repository (<code>at.margin.note</code>, <code>at.margin.annotation</code>, <code>at.margin.highlight</code>). Nothing is stored here. Not affiliated with Margin; notes made with <a href="https://margin.at">Margin</a>.
+  </footer>
+</main></div>
+
+<script>
+"use strict";
+const COLLECTIONS = ["at.margin.note", "at.margin.annotation", "at.margin.highlight"];
+const PUBLIC_API = "https://public.api.bsky.app/xrpc";
+const $ = (id) => document.getElementById(id);
+const status = (msg, err) => { const s = $("status"); s.textContent = msg || ""; s.classList.toggle("err", !!err); };
+
+// ---------- URL identity ----------
+// Kept in step with normUrl in functions/_lib/margin.js.
+// Margin hashes the URL without its scheme (sha256 of "host/path"), so two
+// links to one page match when only scheme, "www.", a trailing slash, the
+// fragment or tracking parameters differ.
+function normUrl(raw) {
+  try {
+    const u = new URL(String(raw).trim());
+    const host = u.hostname.toLowerCase().replace(/^www\./, "");
+    const path = u.pathname.replace(/\/+$/, "");
+    const q = new URLSearchParams(u.search);
+    for (const k of [...q.keys()]) if (/^(utm_|fbclid$|gclid$|ref$|ref_src$|mc_)/i.test(k)) q.delete(k);
+    q.sort();
+    const qs = q.toString();
+    return host + (u.port ? ":" + u.port : "") + path + (qs ? "?" + qs : "");
+  } catch { return String(raw).trim().replace(/^[a-z]+:\/\//i, "").replace(/#.*$/, "").replace(/\/+$/, "").toLowerCase(); }
+}
+
+// ---------- identity ----------
+async function getJSON(url) {
+  const r = await fetch(url, { headers: { accept: "application/json" } });
+  if (!r.ok) { let m = ""; try { m = (await r.json()).message || ""; } catch {} throw new Error(`${r.status} ${m}`.trim()); }
+  return r.json();
+}
+async function resolveHandle(handle) {
+  try { return (await getJSON(`${PUBLIC_API}/com.atproto.identity.resolveHandle?handle=${encodeURIComponent(handle)}`)).did; }
+  catch {
+    try {
+      const r = await fetch(`https://${handle}/.well-known/atproto-did`);
+      if (r.ok) { const t = (await r.text()).trim(); if (t.startsWith("did:")) return t; }
+    } catch {}
+    throw new Error(`Could not resolve the handle “${handle}”.`);
+  }
+}
+async function didDoc(did) {
+  if (did.startsWith("did:plc:")) return getJSON(`https://plc.directory/${did}`);
+  if (did.startsWith("did:web:")) return getJSON(`https://${decodeURIComponent(did.slice(8))}/.well-known/did.json`);
+  throw new Error(`Unsupported DID method: ${did}`);
+}
+async function resolveActor(input) {
+  const id = input.trim().replace(/^@/, "").replace(/^at:\/\//, "");
+  const did = id.startsWith("did:") ? id : await resolveHandle(id.toLowerCase());
+  const doc = await didDoc(did);
+  const pds = (doc.service || []).find((s) => s.id === "#atproto_pds" || s.id === `${did}#atproto_pds`);
+  if (!pds) throw new Error("That account has no PDS listed in its DID document.");
+  // The handle is only trusted when the DID document claims it back.
+  const aka = (doc.alsoKnownAs || []).find((a) => a.startsWith("at://"));
+  return { did, pds: pds.serviceEndpoint.replace(/\/+$/, ""), handle: aka ? aka.slice(5) : null };
+}
+
+// ---------- records ----------
+async function listAll(pds, did, collection, onPage) {
+  const out = []; let cursor;
+  for (let i = 0; i < 200; i++) {
+    const u = `${pds}/xrpc/com.atproto.repo.listRecords?repo=${encodeURIComponent(did)}&collection=${collection}&limit=100${cursor ? "&cursor=" + encodeURIComponent(cursor) : ""}`;
+    const d = await getJSON(u);
+    out.push(...d.records); onPage && onPage(out.length);
+    if (!d.cursor || !d.records.length) break;
+    cursor = d.cursor;
+  }
+  return out;
+}
+function toItem(rec) {
+  const v = rec.value || {}, t = v.target || {}, sel = t.selector || {};
+  const col = rec.uri.split("/")[3];
+  const body = (v.body && v.body.value) || v.text || "";
+  const isHl = col === "at.margin.highlight" || v.motivation === "highlighting" || !body.trim();
+  return {
+    uri: rec.uri, col, source: t.source || "", title: t.title || "", key: normUrl(t.source || ""),
+    exact: sel.exact || "", prefix: sel.prefix || "", suffix: sel.suffix || "",
+    body, tags: v.tags || [], color: v.color || "", createdAt: v.createdAt || "", kind: isHl ? "highlight" : "note",
+  };
+}
+
+// ---------- rendering helpers ----------
+function el(tag, attrs, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null) continue;
+    if (k === "class") n.className = v; else if (k === "text") n.textContent = v; else if (k === "html") n.innerHTML = v; else n.setAttribute(k, v);
+  }
+  for (const k of kids) if (k != null) n.append(k);
+  return n;
+}
+const ICON = {
+  link: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>',
+  open: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+  code: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg>',
+};
+function linkify(text) {
+  const frag = document.createDocumentFragment();
+  const re = /https?:\/\/[^\s<>"')\]]+/g; let last = 0, m;
+  while ((m = re.exec(text))) {
+    frag.append(text.slice(last, m.index));
+    frag.append(el("a", { href: m[0], rel: "noopener", target: "_blank", text: m[0] }));
+    last = m.index + m[0].length;
+  }
+  frag.append(text.slice(last));
+  return frag;
+}
+// Text fragment (#:~:text=) so a click opens the article scrolled to the passage.
+function fragEnc(s) { return encodeURIComponent(s).replace(/-/g, "%2D").replace(/,/g, "%2C").replace(/&/g, "%26"); }
+function textFragmentUrl(it) {
+  const exact = it.exact.replace(/\s+/g, " ").trim(); if (!exact || !it.source) return it.source;
+  const words = exact.split(" ");
+  let core = words.length > 10 ? `${fragEnc(words.slice(0, 5).join(" "))},${fragEnc(words.slice(-5).join(" "))}` : fragEnc(exact);
+  const pw = it.prefix.replace(/\s+/g, " ").trim().split(" ").slice(-3).join(" ");
+  const sw = it.suffix.replace(/\s+/g, " ").trim().split(" ").slice(0, 3).join(" ");
+  if (pw) core = `${fragEnc(pw)}-,${core}`;
+  if (sw) core = `${core},-${fragEnc(sw)}`;
+  return it.source.replace(/#.*$/, "") + "#:~:text=" + core;
+}
+function relTime(iso) {
+  const d = new Date(iso); if (isNaN(d)) return "";
+  const s = (Date.now() - d) / 1000;
+  if (s < 60) return "now";
+  if (s < 3600) return Math.floor(s / 60) + "m";
+  if (s < 86400) return Math.floor(s / 3600) + "h";
+  if (s < 7 * 86400) return Math.floor(s / 86400) + "d";
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: d.getFullYear() === new Date().getFullYear() ? undefined : "numeric" });
+}
+const shortCtx = (s, fromEnd) => { const w = s.replace(/\s+/g, " ").trim().split(" "); if (w.length <= 12) return s.trim(); return fromEnd ? "… " + w.slice(-12).join(" ") : w.slice(0, 12).join(" ") + " …"; };
+const NAMED = { yellow: ["#facc15", "rgb(254 252 232 / .5)"], green: ["#4ade80", "rgb(240 253 244 / .5)"], red: ["#f87171", "rgb(254 242 242 / .5)"], blue: ["#60a5fa", "rgb(239 246 255 / .5)"] };
+function quoteStyle(it) {
+  const c = (it.color || "").toLowerCase();
+  if (/^#[0-9a-f]{6}$/.test(c)) return `border-left-color:${c};background-color:${c}15`;
+  if (NAMED[c]) return `border-left-color:${NAMED[c][0]}`;
+  return null;
+}
+
+function avatarEl(cls) {
+  const a = state.ctx.avatar;
+  return a ? el("img", { class: "avatar" + (cls ? " " + cls : ""), src: a, alt: "", loading: "lazy" }) : el("span", { class: "avatar" + (cls ? " " + cls : "") });
+}
+function renderItem(it) {
+  const prof = `https://bsky.app/profile/${state.ctx.did}`;
+  const head = el("div", { class: "head" },
+    el("a", { href: prof, rel: "noopener", target: "_blank", "aria-hidden": "true", tabindex: "-1" }, avatarEl()),
+    el("div", { class: "meta" },
+      el("a", { class: "name", href: prof, rel: "noopener", target: "_blank", text: state.ctx.name }),
+      el("span", { class: "handle", text: "@" + state.ctx.handle }),
+      el("span", { class: "sep", text: "·" }),
+      el("time", { datetime: it.createdAt, title: new Date(it.createdAt).toLocaleString(), text: relTime(it.createdAt) })));
+  const quote = it.exact ? el("blockquote", { class: it.kind === "highlight" ? "hl" : null, style: quoteStyle(it) },
+    el("a", { href: textFragmentUrl(it), rel: "noopener", target: "_blank", title: "Open this passage in the page" },
+      it.prefix ? el("span", { class: "ctx", text: shortCtx(it.prefix, true) + " " }) : null,
+      el("span", { text: `“${it.exact}”` }),
+      it.suffix ? el("span", { class: "ctx", text: " " + shortCtx(it.suffix, false) }) : null)) : null;
+  const body = it.body.trim() ? el("p", { class: "body" }, linkify(it.body.trim())) : null;
+  const tags = it.tags.length ? el("div", { class: "tags" }, ...it.tags.map((t) => el("span", { text: "#" + t }))) : null;
+  const actions = el("div", { class: "actions" },
+    el("a", { class: "ghost", href: textFragmentUrl(it), rel: "noopener", target: "_blank", title: "Open in page", html: ICON.open + "<span>Open in page</span>" }),
+    el("a", { class: "ghost", href: `https://pdsls.dev/${it.uri}`, rel: "noopener", target: "_blank", title: it.uri, html: ICON.code + "<span>Record</span>" }),
+    el("span", { class: "badge", text: it.kind === "highlight" ? "Highlight" : "Annotation" }));
+  return el("li", null, el("article", { class: "card note" }, head, el("div", { class: "content" }, quote, body, tags), actions));
+}
+
+function markdown(items, ctx) {
+  const lines = [`# ${ctx.title}`, "", `<${ctx.source}>`, "", `Margin notes by @${ctx.handle}`, ""];
+  for (const it of items) {
+    if (it.exact) lines.push(it.exact.split("\n").map((l) => "> " + l).join("\n"));
+    if (it.body.trim()) lines.push("", it.body.trim());
+    lines.push("", "---", "");
+  }
+  return lines.join("\n");
+}
+
+// ---------- page state ----------
+const state = { items: [], filter: "all", sort: "asc", ctx: null, hasPos: false };
+const SORTS = { page: "In page order", asc: "Oldest first", desc: "Newest first" };
+// Place each quote in the article text so notes can be read in page order.
+// Exact match first (prefix breaks ties when a phrase repeats), then the
+// quote's opening or closing words, for text that differs slightly.
+const NQ = (s) => String(s || "").replace(/[\u2018\u2019\u02bc]/g, "'").replace(/[\u201c\u201d]/g, '"').replace(/[\u2010-\u2015]/g, "-").replace(/\s+/g, " ").trim().toLowerCase();
+function locate(text, it) {
+  const e = NQ(it.exact); if (!e) return null;
+  let i = text.indexOf(e);
+  if (i >= 0 && text.indexOf(e, i + 1) >= 0 && it.prefix) {
+    const pre = NQ(it.prefix).slice(-40), j = text.indexOf(pre + " " + e) >= 0 ? text.indexOf(pre + " " + e) : text.indexOf(pre + e);
+    if (j >= 0) i = j + pre.length;
+  }
+  if (i >= 0) return i;
+  const w = e.split(" ");
+  if (w.length >= 6) {
+    i = text.indexOf(w.slice(0, 6).join(" ")); if (i >= 0) return i;
+    i = text.indexOf(w.slice(-6).join(" ")); if (i >= 0) return i;
+  }
+  return null;
+}
+async function placeInPage(h, url, token) {
+  try {
+    const r = await fetch(`api/page?h=${encodeURIComponent(h)}&url=${encodeURIComponent(url)}`);
+    if (!r.ok) return;
+    const d = await r.json(); if (!d.text || token !== runToken) return;
+    const text = NQ(d.text);
+    let placed = 0;
+    for (const it of state.items) { it.pos = locate(text, it); if (it.pos != null) placed++; }
+    if (!placed) return;
+    state.hasPos = true; state.sort = "page"; state.textSource = d.textSource; draw();
+  } catch {}
+}
+function draw() {
+  const list = $("notes"); list.replaceChildren();
+  let items = state.items.filter((i) => state.filter === "all" || i.kind === state.filter);
+  const byTime = (a, b) => (a.createdAt < b.createdAt ? -1 : 1);
+  if (state.sort === "page") items = items.slice().sort((a, b) => (a.pos ?? Infinity) - (b.pos ?? Infinity) || byTime(a, b));
+  else items = items.slice().sort((a, b) => byTime(a, b) * (state.sort === "asc" ? 1 : -1));
+  items.forEach((it) => list.append(renderItem(it)));
+  const n = state.items.filter((i) => i.kind === "note").length;
+  $("n-all").textContent = state.items.length; $("n-notes").textContent = n; $("n-hl").textContent = state.items.length - n;
+  $("sort").textContent = SORTS[state.sort];
+  for (const [id, f] of [["f-all", "all"], ["f-notes", "note"], ["f-hl", "highlight"]]) $(id).setAttribute("aria-pressed", String(state.filter === f));
+}
+$("f-all").onclick = () => { state.filter = "all"; draw(); };
+$("f-notes").onclick = () => { state.filter = "note"; draw(); };
+$("f-hl").onclick = () => { state.filter = "highlight"; draw(); };
+$("sort").onclick = () => {
+  const order = state.hasPos ? ["page", "asc", "desc"] : ["asc", "desc"];
+  state.sort = order[(order.indexOf(state.sort) + 1) % order.length]; draw();
+};
+$("ctx").onclick = () => { const on = document.body.classList.toggle("show-ctx"); $("ctx").setAttribute("aria-pressed", String(on)); };
+$("md").onclick = async () => {
+  const items = state.hasPos ? state.items.slice().sort((a, b) => (a.pos ?? Infinity) - (b.pos ?? Infinity) || (a.createdAt < b.createdAt ? -1 : 1))
+    : state.items.slice().sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
+  try { await navigator.clipboard.writeText(markdown(items, state.ctx)); $("md").textContent = "Copied"; }
+  catch { $("md").textContent = "Copy failed"; }
+  setTimeout(() => ($("md").textContent = "Copy Markdown"), 1600);
+};
+
+function shareLink(h, url) {
+  const p = new URLSearchParams(); p.set("h", h); if (url) p.set("url", url);
+  return `${location.origin}${location.pathname}?${p.toString()}`;
+}
+// ---------- handle autocomplete ----------
+// Public typeahead from the Bluesky AppView, the same lookup Bluesky's own
+// compose box uses. Arrow keys move, Enter or Tab picks, Escape closes.
+(() => {
+  const inp = $("in-h"), list = $("h-list");
+  let timer = 0, seq = 0, opts = [], active = -1;
+  const close = () => { list.hidden = true; inp.setAttribute("aria-expanded", "false"); inp.removeAttribute("aria-activedescendant"); active = -1; };
+  const mark = () => {
+    [...list.children].forEach((li, i) => li.setAttribute("aria-selected", String(i === active)));
+    if (active >= 0) { inp.setAttribute("aria-activedescendant", "h-opt-" + active); list.children[active].scrollIntoView({ block: "nearest" }); }
+  };
+  const pick = (a) => { inp.value = a.handle; close(); loadPages(a.handle); $("in-url").focus(); };
+  async function search(q) {
+    const my = ++seq;
+    try {
+      const d = await getJSON(`${PUBLIC_API}/app.bsky.actor.searchActorsTypeahead?q=${encodeURIComponent(q)}&limit=8`);
+      if (my !== seq || inp.value.trim().replace(/^@/, "") !== q) return;
+      opts = (d.actors || []).filter((a) => a.handle && a.handle !== "handle.invalid");
+      list.replaceChildren(...opts.map((a, i) => el("li", { id: "h-opt-" + i, role: "option", "aria-selected": "false" },
+        a.avatar ? el("img", { src: a.avatar, alt: "", loading: "lazy" }) : el("span", { class: "ph" }),
+        el("span", { class: "tx" }, el("span", { class: "nm", text: a.displayName || a.handle }), el("span", { class: "hd", text: "@" + a.handle })))));
+      [...list.children].forEach((li, i) => li.addEventListener("mousedown", (e) => { e.preventDefault(); pick(opts[i]); }));
+      active = -1;
+      if (opts.length) { list.hidden = false; inp.setAttribute("aria-expanded", "true"); } else close();
+    } catch { close(); }
+  }
+  inp.addEventListener("input", () => {
+    clearTimeout(timer);
+    const q = inp.value.trim().replace(/^@/, "");
+    if (!q || q.startsWith("did:")) { close(); return; }
+    timer = setTimeout(() => search(q), 150);
+  });
+  inp.addEventListener("keydown", (e) => {
+    if (list.hidden || !opts.length) return;
+    if (e.key === "ArrowDown") { e.preventDefault(); active = (active + 1) % opts.length; mark(); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); active = (active - 1 + opts.length) % opts.length; mark(); }
+    else if ((e.key === "Enter" || e.key === "Tab") && active >= 0) { e.preventDefault(); pick(opts[active]); }
+    else if (e.key === "Escape") { close(); }
+  });
+  inp.addEventListener("blur", () => setTimeout(close, 100));
+  inp.addEventListener("change", () => loadPages(inp.value));
+})();
+
+// Once a handle is known, offer the pages that person has annotated.
+let pagesFor = "";
+async function loadPages(h) {
+  h = String(h || "").trim().replace(/^@/, "");
+  if (!h || h === pagesFor) return;
+  pagesFor = h;
+  try {
+    const actor = await resolveActor(h);
+    const recs = (await Promise.all(COLLECTIONS.map((c) => listAll(actor.pds, actor.did, c).catch(() => [])))).flat();
+    if (pagesFor !== h) return;
+    const seen = new Map();
+    for (const it of recs.map(toItem)) {
+      if (!it.source) continue;
+      const g = seen.get(it.key) || { source: it.source, title: it.title, last: "" };
+      if (it.createdAt > g.last) g.last = it.createdAt; if (!g.title && it.title) g.title = it.title;
+      seen.set(it.key, g);
+    }
+    $("url-list").replaceChildren(...[...seen.values()].sort((a, b) => (a.last < b.last ? 1 : -1))
+      .map((g) => el("option", { value: g.source }, g.title || "")));
+  } catch {}
+}
+
+$("form").onsubmit = (e) => {
+  e.preventDefault();
+  const h = $("in-h").value.trim().replace(/^@/, ""), url = $("in-url").value.trim();
+  if (!h) return;
+  const link = shareLink(h, url);
+  $("out-link").value = link; $("out").hidden = false;
+  history.pushState(null, "", link); run();
+};
+$("copy").onclick = async () => {
+  try { await navigator.clipboard.writeText($("out-link").value); $("copy").textContent = "Copied"; }
+  catch { $("out-link").select(); $("copy").textContent = "Select + copy"; }
+  setTimeout(() => ($("copy").textContent = "Copy"), 1600);
+};
+window.onpopstate = () => run();
+
+let runToken = 0;
+async function run() {
+  const token = ++runToken;
+  state.items = []; state.hasPos = false; state.sort = "asc";
+  const q = new URLSearchParams(location.search);
+  const h = q.get("h") || q.get("handle") || "", url = q.get("url") || "";
+  $("in-h").value = h; $("in-url").value = url;
+  $("notes").replaceChildren(); $("pages").replaceChildren(); $("bar").hidden = true;
+  if (!h) { $("view").hidden = true; $("maker").hidden = false; status(""); return; }
+  $("view").hidden = false; $("maker").hidden = true;
+  $("title").textContent = ""; $("src").replaceChildren(); $("byline").replaceChildren();
+  $("notes").append(el("li", null, el("div", { class: "skeleton" })), el("li", null, el("div", { class: "skeleton" })));
+  try {
+    status("Resolving account…");
+    const actor = await resolveActor(h);
+    const prof = getJSON(`${PUBLIC_API}/app.bsky.actor.getProfile?actor=${encodeURIComponent(actor.did)}`).catch(() => null);
+    const counts = {};
+    const recs = (await Promise.all(COLLECTIONS.map((c) =>
+      listAll(actor.pds, actor.did, c, (n) => { counts[c] = n; status(`Reading records… ${Object.values(counts).reduce((a, b) => a + b, 0)}`); })
+        .catch((err) => { if (/40[04]/.test(err.message)) return []; throw err; })))).flat();
+    $("notes").replaceChildren();
+    const all = recs.map(toItem).filter((i) => i.source);
+    const p = await prof;
+    const handle = actor.handle || (p && p.handle) || actor.did;
+    state.ctx = { did: actor.did, handle, name: (p && p.displayName) || handle, avatar: p && p.avatar };
+    const profUrl = `https://bsky.app/profile/${actor.did}`;
+    $("byline").replaceChildren(avatarEl(),
+      el("div", null, el("a", { class: "name", href: profUrl, rel: "noopener", target: "_blank", text: state.ctx.name }), el("div", { class: "handle", text: "@" + handle })));
+
+    if (!url) {
+      // Index mode: every page this person has annotated.
+      const groups = new Map();
+      for (const it of all) {
+        const g = groups.get(it.key) || { source: it.source, title: "", items: [], last: "" };
+        g.items.push(it); if (it.title && !g.title) g.title = it.title; if (it.createdAt > g.last) g.last = it.createdAt;
+        groups.set(it.key, g);
+      }
+      const sorted = [...groups.values()].sort((a, b) => (a.last < b.last ? 1 : -1));
+      $("title").textContent = "Annotated pages";
+      document.title = `Margin notes · @${handle}`;
+      $("src").textContent = `${sorted.length} pages · ${all.length} notes and highlights`;
+      for (const g of sorted) {
+        const n = g.items.filter((i) => i.kind === "note").length;
+        $("pages").append(el("li", null, el("a", { class: "card", href: shareLink(h, g.source) },
+          el("span", { class: "t", text: g.title || g.source.replace(/^https?:\/\//, "") }),
+          el("span", { class: "u", text: g.source.replace(/^https?:\/\//, "") }),
+          el("span", { class: "c", text: `${n} annotation${n === 1 ? "" : "s"} · ${g.items.length - n} highlight${g.items.length - n === 1 ? "" : "s"} · ${relTime(g.last)}` }))));
+      }
+      status(sorted.length ? "" : "No Margin records found for this account.");
+      return;
+    }
+
+    const key = normUrl(url);
+    state.items = all.filter((i) => i.key === key);
+    const title = (state.items.find((i) => i.title) || {}).title || url.replace(/^https?:\/\//, "");
+    const source = (state.items[0] || {}).source || url;
+    Object.assign(state.ctx, { title, source });
+    document.title = `${title} · Margin notes by @${handle}`;
+    $("title").replaceChildren(el("a", { href: source, rel: "noopener", target: "_blank", text: title }));
+    $("src").replaceChildren(el("span", { html: ICON.link }), el("a", { href: source, rel: "noopener", target: "_blank", text: source.replace(/^https?:\/\//, "") }));
+    if (!state.items.length) { status(`@${handle} has no Margin notes or highlights on this page.`); return; }
+    $("bar").hidden = false; status(""); draw();
+    placeInPage(h, source, token);
+  } catch (err) {
+    $("notes").replaceChildren();
+    status(`Couldn’t load: ${err.message}`, true);
+    $("maker").hidden = false;
+  }
+}
+run();
+</script>
+</body>
+</html>
