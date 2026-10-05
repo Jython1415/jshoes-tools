@@ -6,124 +6,184 @@
 <title>Margin notes</title>
 <meta name="description" content="One person's Margin highlights and notes on one web page, read live from their AT Protocol repository.">
 <meta name="robots" content="noindex">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2032%2032%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%225%22%20fill%3D%22%23E7EAE5%22/%3E%3Crect%20x%3D%226%22%20y%3D%225%22%20width%3D%223%22%20height%3D%2222%22%20fill%3D%22%23B4553E%22/%3E%3Crect%20x%3D%2213%22%20y%3D%228%22%20width%3D%2213%22%20height%3D%223%22%20fill%3D%22%23565C59%22/%3E%3Crect%20x%3D%2213%22%20y%3D%2214%22%20width%3D%2213%22%20height%3D%223%22%20fill%3D%22%23B0801F%22/%3E%3Crect%20x%3D%2213%22%20y%3D%2220%22%20width%3D%229%22%20height%3D%223%22%20fill%3D%22%23565C59%22/%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2032%2032%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227%22%20fill%3D%22%2318181b%22/%3E%3Crect%20x%3D%228%22%20y%3D%227%22%20width%3D%223%22%20height%3D%2218%22%20rx%3D%221.5%22%20fill%3D%22%23facc15%22/%3E%3Crect%20x%3D%2214%22%20y%3D%229%22%20width%3D%2211%22%20height%3D%222.5%22%20rx%3D%221.25%22%20fill%3D%22%23fafafa%22/%3E%3Crect%20x%3D%2214%22%20y%3D%2214.75%22%20width%3D%2211%22%20height%3D%222.5%22%20rx%3D%221.25%22%20fill%3D%22%23a1a1aa%22/%3E%3Crect%20x%3D%2214%22%20y%3D%2220.5%22%20width%3D%227%22%20height%3D%222.5%22%20rx%3D%221.25%22%20fill%3D%22%23a1a1aa%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@500;600;700&display=swap">
 <style>
+/* Palette and type follow Margin's own design tokens (web/tailwind.config.mjs,
+   web/src/styles/global.css in github.com/margin-at/margin): zinc "surface"
+   scale, blue "primary", Inter body, Outfit headings. */
 :root{
-  --paper:#E7EAE5; --surface:#F2F4F0; --ink:#161D1F; --ink-2:#4F5B58; --ink-3:#6A7571;
-  --rule:#C4CCC2; --rule-soft:#D5DBD2; --brick:#B4553E; --stone:#4F7189; --marsh:#557044; --ochre:#B0801F;
-  --mark:#F3E3B5;
+  --s50:#fafafa; --s100:#f4f4f5; --s200:#e4e4e7; --s300:#d4d4d8; --s400:#a1a1aa; --s500:#71717a;
+  --s600:#52525b; --s700:#3f3f46; --s800:#27272a; --s900:#18181b; --s950:#09090b;
+  --brand:#027bff; --p50:#eff6ff; --p100:#dbeafe; --p400:#60a5fa; --p600:#2563eb; --p900:#1e3a8a;
+
+  --page:var(--s100); --panel:#fff; --card:var(--s100); --card-border:rgb(228 228 231 / .6);
+  --text:var(--s900); --text-2:var(--s600); --text-3:var(--s400); --hair:var(--s300);
+  --link:var(--p600); --chip:var(--s200); --chip-on:#fff;
+  --q-note:var(--s300); --q-hl:#facc15; --q-hl-bg:rgb(254 252 232 / .5); --q-hover:var(--s50);
+  --input:var(--s50); --input-border:var(--s200);
+  --shadow:0 1px 2px 0 rgb(0 0 0 / .05);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --paper:#12171A; --surface:#1A2024; --ink:#E2E7E3; --ink-2:#A3AFAB; --ink-3:#8A9591;
-    --rule:#333C40; --rule-soft:#283034; --brick:#DB7A61; --stone:#7FA6C0; --marsh:#84A870; --ochre:#D2A24A;
-    --mark:#3A3420;
+    --page:var(--s950); --panel:var(--s900); --card:var(--s900); --card-border:var(--s800);
+    --text:var(--s50); --text-2:var(--s300); --text-3:var(--s500); --hair:var(--s600);
+    --link:var(--p400); --chip:var(--s800); --chip-on:var(--s700);
+    --q-note:var(--s600); --q-hl-bg:rgb(113 63 18 / .2); --q-hover:rgb(39 39 42 / .5);
+    --input:var(--s800); --input-border:var(--s700); --shadow:none;
   }
 }
 :root[data-theme="dark"]{
-  --paper:#12171A; --surface:#1A2024; --ink:#E2E7E3; --ink-2:#A3AFAB; --ink-3:#8A9591;
-  --rule:#333C40; --rule-soft:#283034; --brick:#DB7A61; --stone:#7FA6C0; --marsh:#84A870; --ochre:#D2A24A;
-  --mark:#3A3420;
+  --page:var(--s950); --panel:var(--s900); --card:var(--s900); --card-border:var(--s800);
+  --text:var(--s50); --text-2:var(--s300); --text-3:var(--s500); --hair:var(--s600);
+  --link:var(--p400); --chip:var(--s800); --chip-on:var(--s700);
+  --q-note:var(--s600); --q-hl-bg:rgb(113 63 18 / .2); --q-hover:rgb(39 39 42 / .5);
+  --input:var(--s800); --input-border:var(--s700); --shadow:none;
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;background:var(--page)}
 body{
-  margin:0;background:var(--paper);color:var(--ink);
-  font-family:"Source Serif 4",Georgia,serif;font-size:17px;line-height:1.6;
-  -webkit-font-smoothing:antialiased;
+  margin:0;background:var(--page);color:var(--text);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
 }
-.wrap{max-width:720px;margin:0 auto;padding:clamp(2.4rem,7vw,4.5rem) 1rem 4rem}
-.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
-.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);font-weight:500;margin:0 0 .9rem}
-.eyebrow a{color:inherit}
-h1{font-family:"Zilla Slab",Rockwell,Georgia,serif;font-weight:700;font-size:clamp(1.8rem,5.6vw,2.6rem);line-height:1.08;letter-spacing:-.015em;margin:0;overflow-wrap:anywhere}
-h1 a{color:inherit;text-decoration:none}
-h1 a:hover{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
-.src{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.74rem;color:var(--ink-3);margin:.7rem 0 0;word-break:break-all}
-.src a{color:inherit}
-.byline{display:flex;align-items:center;gap:.7rem;margin:1.4rem 0 0;color:var(--ink-2);font-size:.95rem}
-.byline img{width:36px;height:36px;border-radius:50%;background:var(--rule-soft);flex:none}
-.byline a{color:var(--ink);text-decoration:none;font-weight:600}
-.byline a:hover{text-decoration:underline}
-.byline .h{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.74rem;color:var(--ink-3);display:block}
-.rule{height:4px;display:flex;margin:1.8rem 0 0;border-radius:2px;overflow:hidden}
-.rule i{flex:1}
-.bar{display:flex;flex-wrap:wrap;gap:.5rem .9rem;align-items:center;margin:1.4rem 0 .4rem;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;color:var(--ink-3)}
-.bar .sp{flex:1}
-button,.btn{
-  font:500 .72rem/1 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.04em;
-  background:transparent;color:var(--ink-2);border:1px solid var(--rule);border-radius:3px;
-  padding:.5rem .7rem;cursor:pointer;text-decoration:none;display:inline-block;min-height:32px;
-}
-button:hover,.btn:hover{border-color:var(--stone);color:var(--ink)}
-button[aria-pressed="true"]{border-color:var(--ink-2);color:var(--ink);background:var(--surface)}
-button.primary{background:var(--brick);border-color:var(--brick);color:#FBF7F2}
-button.primary:hover{filter:brightness(1.06);color:#FBF7F2}
-:focus-visible{outline:2px solid var(--stone);outline-offset:2px}
-ol.notes{list-style:none;margin:0;padding:0}
-ol.notes>li{padding:1.5rem 0;border-bottom:1px solid var(--rule-soft)}
-ol.notes>li:last-child{border-bottom:0}
+h1,h2,.display{font-family:Outfit,ui-sans-serif,system-ui,sans-serif;letter-spacing:-.02em}
+a{color:var(--link)}
+.shell{max-width:760px;margin:0 auto;padding:12px 12px 48px}
+.panel{background:var(--panel);border-radius:20px;padding:24px clamp(16px,4vw,40px) 32px;min-height:calc(100vh - 24px)}
+.top{display:flex;align-items:center;gap:8px;margin:0 0 20px;font-size:13px;color:var(--text-3)}
+.top a{color:inherit;text-decoration:none;font-weight:500}
+.top a:hover{color:var(--text)}
+.top .dot{color:var(--hair)}
+.card{background:var(--card);border:1px solid var(--card-border);border-radius:12px;box-shadow:var(--shadow)}
+
+/* page header card */
+.hero{padding:20px}
+.hero h1{font-size:clamp(22px,4.4vw,28px);line-height:1.15;font-weight:700;margin:0;overflow-wrap:anywhere}
+.hero h1 a{color:inherit;text-decoration:none}
+.hero h1 a:hover{text-decoration:underline;text-underline-offset:3px}
+.srcline{display:flex;align-items:center;gap:5px;margin:8px 0 0;font-size:12px;min-width:0}
+.srcline a{color:var(--link);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.srcline a:hover{text-decoration:underline}
+.srcline svg{flex:none;color:var(--link)}
+.who{display:flex;align-items:center;gap:12px;margin:16px 0 0;padding:14px 0 0;border-top:1px solid var(--card-border)}
+.who .name{font-weight:600;font-size:15px;color:var(--text);text-decoration:none}
+.who .name:hover{text-decoration:underline}
+.who .handle{color:var(--text-3);font-size:14px;overflow-wrap:anywhere}
+.avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;background:var(--s300);flex:none;display:block}
+.avatar.lg{width:48px;height:48px}
+
+/* tabs (Margin's segmented control) */
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:16px 0}
+.tabs{display:inline-flex;gap:2px;padding:4px;border-radius:10px;background:var(--chip)}
+.tabs button{border:0;background:transparent;color:var(--text-2);font:500 13px/1 Inter,system-ui,sans-serif;padding:8px 12px;border-radius:7px;cursor:pointer;min-height:32px}
+.tabs button:hover{color:var(--text)}
+.tabs button[aria-pressed="true"]{background:var(--chip-on);color:var(--text);box-shadow:var(--shadow)}
+.tabs .n{color:var(--text-3);font-weight:400;margin-left:4px}
+.toolbar .sp{flex:1}
+.ghost{border:0;background:transparent;color:var(--text-3);font:500 12px/1 Inter,system-ui,sans-serif;padding:8px 10px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;min-height:32px;text-decoration:none}
+.ghost:hover{color:var(--link);background:var(--q-hover)}
+
+/* note cards */
+ol.notes{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+article.note{padding:16px}
+.head{display:flex;align-items:center;gap:12px;min-width:0}
+.head .meta{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;min-width:0}
+.head .name{font-weight:600;font-size:15px;color:var(--text);text-decoration:none}
+.head .name:hover{text-decoration:underline}
+.head .handle,.head time{color:var(--text-3);font-size:14px}
+.head .sep{color:var(--hair)}
+.content{margin:12px 0 0 52px}
 blockquote{
-  margin:0;padding:.15rem 0 .15rem 1.1rem;border-left:4px solid var(--ochre);
-  color:var(--ink);font-size:1rem;line-height:1.62;
+  margin:0 0 12px;padding:8px 8px 8px 16px;border-left:3px solid var(--q-note);border-radius:0 8px 8px 0;
+  font-size:15px;font-style:italic;color:var(--text-2);transition:background-color .2s ease-out;
 }
-blockquote .ctx{color:var(--ink-3)}
-blockquote mark{background:var(--mark);color:inherit;padding:0 .08em;border-radius:2px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
-blockquote a.jump{color:inherit;text-decoration:none}
-blockquote a.jump:hover mark{text-decoration:underline;text-decoration-color:var(--ink-3);text-underline-offset:3px}
-.body{margin:.9rem 0 0;font-size:1.02rem;white-space:pre-wrap;overflow-wrap:anywhere}
-.body a{color:var(--brick)}
-.meta{display:flex;flex-wrap:wrap;gap:.2rem .9rem;margin:.75rem 0 0;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.7rem;color:var(--ink-3);letter-spacing:.02em}
-.meta a{color:inherit}
-.kind{text-transform:uppercase;letter-spacing:.12em}
-.tags{display:flex;flex-wrap:wrap;gap:.35rem;margin:.6rem 0 0}
-.tags span{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.68rem;color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:.05rem .5rem}
-.status{color:var(--ink-2);font-size:.95rem;margin:2rem 0}
-.status.err{color:var(--brick)}
-form{display:grid;gap:.9rem;margin:1.6rem 0 0;background:var(--surface);border:1px solid var(--rule-soft);border-radius:3px;padding:1.1rem 1.2rem}
-label{display:grid;gap:.3rem;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.06em;color:var(--ink-2)}
+blockquote.hl{border-left-color:var(--q-hl);background:var(--q-hl-bg)}
+blockquote:hover{background:var(--q-hover)}
+blockquote.hl:hover{background:var(--q-hl-bg)}
+blockquote a{color:inherit;text-decoration:none;display:block;overflow-wrap:anywhere}
+blockquote .ctx{display:none}
+.show-ctx blockquote .ctx{display:inline;color:var(--text-3);font-style:normal}
+.body{margin:0;color:var(--text);white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.625;font-size:15px}
+.content > :last-child{margin-bottom:0}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0}
+.tags span{padding:4px 8px;border-radius:6px;background:var(--chip);font-size:12px;font-weight:500;color:var(--text-2)}
+.actions{display:flex;align-items:center;gap:2px;margin:10px 0 0 44px}
+.badge{font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--text-3);padding:0 8px}
+
+/* index of pages */
+ul.pages{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}
+ul.pages a.card{display:block;padding:14px 16px;text-decoration:none;color:inherit}
+ul.pages a.card:hover{border-color:var(--s300)}
+ul.pages .t{font-family:Outfit,ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:16px;letter-spacing:-.01em;line-height:1.3;display:block;overflow-wrap:anywhere;color:var(--text)}
+ul.pages .u{display:block;font-size:12px;color:var(--link);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ul.pages .c{display:block;font-size:12px;color:var(--text-3);margin-top:2px}
+
+/* maker form */
+.maker{padding:20px;margin:0}
+.maker h2{font-size:20px;font-weight:600;margin:0 0 14px}
+form{display:grid;gap:14px}
+label{display:grid;gap:6px;font-size:13px;font-weight:500;color:var(--text-2)}
 input{
-  font:400 .95rem/1.3 "IBM Plex Mono",ui-monospace,monospace;color:var(--ink);background:var(--paper);
-  border:1px solid var(--rule);border-radius:3px;padding:.6rem .7rem;width:100%;min-height:44px;
+  font:400 14px/1.3 Inter,system-ui,sans-serif;color:var(--text);background:var(--input);
+  border:1px solid var(--input-border);border-radius:12px;padding:10px 12px;width:100%;min-height:44px;
 }
-input:focus{border-color:var(--stone);outline:none}
-.out{display:flex;gap:.5rem;align-items:stretch}
-.out input{font-size:.78rem}
-.hint{font-size:.85rem;color:var(--ink-3);margin:0}
-ul.pages{list-style:none;margin:1rem 0 0;padding:0;display:flex;flex-direction:column;gap:.7rem}
-ul.pages a{display:block;background:var(--surface);border:1px solid var(--rule-soft);border-left:4px solid var(--brick);border-radius:3px;padding:.9rem 1.1rem;text-decoration:none;color:inherit}
-ul.pages a:hover{border-left-color:var(--stone)}
-ul.pages .t{font-family:"Zilla Slab",Georgia,serif;font-weight:600;font-size:1.05rem;line-height:1.3;display:block;overflow-wrap:anywhere}
-ul.pages .u{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.68rem;color:var(--ink-3);display:block;margin-top:.35rem;word-break:break-all}
-details{margin:3rem 0 0;border-top:1px solid var(--rule);padding-top:1.2rem}
-summary{cursor:pointer;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
-footer{margin-top:3rem;padding-top:1.2rem;border-top:1px solid var(--rule);color:var(--ink-3);font-size:.82rem}
-footer a{color:var(--brick)}
+input::placeholder{color:var(--text-3)}
+input:focus{outline:none;border-color:var(--p400);box-shadow:0 0 0 3px rgb(96 165 250 / .2)}
+.primary{
+  justify-self:start;border:0;border-radius:999px;background:var(--brand);color:#fff;
+  font:600 14px/1 Inter,system-ui,sans-serif;padding:12px 20px;cursor:pointer;min-height:44px;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.primary:hover{background:var(--p600)}
+.out{display:flex;gap:8px}
+.out input{font-size:12px}
+.secondary{border:1px solid var(--input-border);background:var(--panel);color:var(--text);border-radius:999px;font:500 13px/1 Inter,system-ui,sans-serif;padding:0 16px;cursor:pointer;min-height:44px;white-space:nowrap}
+.secondary:hover{background:var(--chip)}
+:focus-visible{outline:2px solid var(--p400);outline-offset:2px}
+
+.status{color:var(--text-2);font-size:14px;margin:20px 4px}
+.status.err{color:#ef4444}
+.skeleton{height:120px;border-radius:12px;background:var(--card);border:1px solid var(--card-border);animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.55}}
+footer{margin:32px 4px 0;color:var(--text-3);font-size:12px;line-height:1.6}
+footer a{color:inherit}
+footer code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px}
 [hidden]{display:none !important}
-@media (max-width:520px){ body{font-size:16px} .out{flex-direction:column} }
+@media (max-width:560px){
+  .shell{padding:0}
+  .panel{border-radius:0;min-height:100vh}
+  .content{margin-left:0}
+  .actions{margin-left:-8px}
+  .out{flex-direction:column}
+  .head .meta{flex-wrap:nowrap}
+  .head .handle{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+  .head .name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <p class="eyebrow"><a href="./">Margin notes</a></p>
+<div class="shell"><main class="panel">
+  <nav class="top"><a href="./" class="display">Margin notes</a><span class="dot">·</span><span>notes from <a href="https://margin.at" rel="noopener">margin.at</a></span></nav>
 
   <section id="view" hidden>
-    <h1 id="title"></h1>
-    <p class="src" id="src"></p>
-    <div class="byline" id="byline"></div>
-    <div class="rule"><i style="background:var(--marsh)"></i><i style="background:var(--ochre)"></i><i style="background:#565C59"></i><i style="background:var(--brick)"></i><i style="background:var(--stone)"></i></div>
-    <div class="bar" id="bar" hidden>
-      <span id="count"></span>
+    <div class="card hero">
+      <h1 id="title"></h1>
+      <p class="srcline" id="src"></p>
+      <div class="who" id="byline"></div>
+    </div>
+    <div class="toolbar" id="bar" hidden>
+      <div class="tabs" role="group" aria-label="Filter">
+        <button type="button" id="f-all" aria-pressed="true">All<span class="n" id="n-all"></span></button>
+        <button type="button" id="f-notes" aria-pressed="false">Annotations<span class="n" id="n-notes"></span></button>
+        <button type="button" id="f-hl" aria-pressed="false">Highlights<span class="n" id="n-hl"></span></button>
+      </div>
       <span class="sp"></span>
-      <button type="button" id="f-all" aria-pressed="true">All</button>
-      <button type="button" id="f-notes" aria-pressed="false">Notes</button>
-      <button type="button" id="f-hl" aria-pressed="false">Highlights</button>
-      <button type="button" id="sort" title="Toggle order">Oldest first</button>
-      <button type="button" id="md">Copy Markdown</button>
+      <button type="button" class="ghost" id="ctx" aria-pressed="false">Context</button>
+      <button type="button" class="ghost" id="sort">Oldest first</button>
+      <button type="button" class="ghost" id="md">Copy Markdown</button>
     </div>
     <ol class="notes" id="notes"></ol>
     <ul class="pages" id="pages"></ul>
@@ -131,7 +191,8 @@ footer a{color:var(--brick)}
 
   <p class="status" id="status" role="status" aria-live="polite"></p>
 
-  <section id="maker">
+  <section id="maker" class="card maker">
+    <h2>Share your notes on a page</h2>
     <form id="form" autocomplete="off">
       <label>Bluesky / atproto handle or DID
         <input id="in-h" name="h" placeholder="joshuashew.bsky.social" spellcheck="false" autocapitalize="off" required>
@@ -139,18 +200,18 @@ footer a{color:var(--brick)}
       <label>Page URL (leave empty to list every annotated page)
         <input id="in-url" name="url" type="url" placeholder="https://…" spellcheck="false">
       </label>
-      <div><button type="submit" class="primary">Make link</button></div>
+      <button type="submit" class="primary">Make link</button>
       <div class="out" id="out" hidden>
         <input id="out-link" readonly aria-label="Share link">
-        <button type="button" id="copy">Copy</button>
+        <button type="button" class="secondary" id="copy">Copy</button>
       </div>
     </form>
   </section>
 
   <footer>
-    <p>Read live from the author's own AT Protocol repository (records <span class="mono">at.margin.note</span>, <span class="mono">at.margin.annotation</span>, <span class="mono">at.margin.highlight</span>). Nothing is stored here. Notes made with <a href="https://margin.at">Margin</a>.</p>
+    Read live from the author's own AT Protocol repository (<code>at.margin.note</code>, <code>at.margin.annotation</code>, <code>at.margin.highlight</code>). Nothing is stored here. Not affiliated with Margin; notes made with <a href="https://margin.at">Margin</a>.
   </footer>
-</div>
+</main></div>
 
 <script>
 "use strict";
@@ -166,8 +227,8 @@ const status = (msg, err) => { const s = $("status"); s.textContent = msg || "";
 function normUrl(raw) {
   try {
     const u = new URL(String(raw).trim());
-    let host = u.hostname.toLowerCase().replace(/^www\./, "");
-    let path = u.pathname.replace(/\/+$/, "");
+    const host = u.hostname.toLowerCase().replace(/^www\./, "");
+    const path = u.pathname.replace(/\/+$/, "");
     const q = new URLSearchParams(u.search);
     for (const k of [...q.keys()]) if (/^(utm_|fbclid$|gclid$|ref$|ref_src$|mc_)/i.test(k)) q.delete(k);
     q.sort();
@@ -185,8 +246,10 @@ async function getJSON(url) {
 async function resolveHandle(handle) {
   try { return (await getJSON(`${PUBLIC_API}/com.atproto.identity.resolveHandle?handle=${encodeURIComponent(handle)}`)).did; }
   catch {
-    const r = await fetch(`https://${handle}/.well-known/atproto-did`);
-    if (r.ok) { const t = (await r.text()).trim(); if (t.startsWith("did:")) return t; }
+    try {
+      const r = await fetch(`https://${handle}/.well-known/atproto-did`);
+      if (r.ok) { const t = (await r.text()).trim(); if (t.startsWith("did:")) return t; }
+    } catch {}
     throw new Error(`Could not resolve the handle “${handle}”.`);
   }
 }
@@ -203,8 +266,7 @@ async function resolveActor(input) {
   if (!pds) throw new Error("That account has no PDS listed in its DID document.");
   // The handle is only trusted when the DID document claims it back.
   const aka = (doc.alsoKnownAs || []).find((a) => a.startsWith("at://"));
-  const handle = aka ? aka.slice(5) : null;
-  return { did, pds: pds.serviceEndpoint.replace(/\/+$/, ""), handle };
+  return { did, pds: pds.serviceEndpoint.replace(/\/+$/, ""), handle: aka ? aka.slice(5) : null };
 }
 
 // ---------- records ----------
@@ -231,16 +293,21 @@ function toItem(rec) {
   };
 }
 
-// ---------- rendering ----------
+// ---------- rendering helpers ----------
 function el(tag, attrs, ...kids) {
   const n = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs || {})) {
     if (v == null) continue;
-    if (k === "class") n.className = v; else if (k === "text") n.textContent = v; else n.setAttribute(k, v);
+    if (k === "class") n.className = v; else if (k === "text") n.textContent = v; else if (k === "html") n.innerHTML = v; else n.setAttribute(k, v);
   }
   for (const k of kids) if (k != null) n.append(k);
   return n;
 }
+const ICON = {
+  link: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>',
+  open: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+  code: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg>',
+};
 function linkify(text) {
   const frag = document.createDocumentFragment();
   const re = /https?:\/\/[^\s<>"')\]]+/g; let last = 0, m;
@@ -264,26 +331,53 @@ function textFragmentUrl(it) {
   if (sw) core = `${core},-${fragEnc(sw)}`;
   return it.source.replace(/#.*$/, "") + "#:~:text=" + core;
 }
-const fmtDate = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleString(undefined, { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); };
+function relTime(iso) {
+  const d = new Date(iso); if (isNaN(d)) return "";
+  const s = (Date.now() - d) / 1000;
+  if (s < 60) return "now";
+  if (s < 3600) return Math.floor(s / 60) + "m";
+  if (s < 86400) return Math.floor(s / 3600) + "h";
+  if (s < 7 * 86400) return Math.floor(s / 86400) + "d";
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: d.getFullYear() === new Date().getFullYear() ? undefined : "numeric" });
+}
 const shortCtx = (s, fromEnd) => { const w = s.replace(/\s+/g, " ").trim().split(" "); if (w.length <= 12) return s.trim(); return fromEnd ? "… " + w.slice(-12).join(" ") : w.slice(0, 12).join(" ") + " …"; };
+const NAMED = { yellow: ["#facc15", "rgb(254 252 232 / .5)"], green: ["#4ade80", "rgb(240 253 244 / .5)"], red: ["#f87171", "rgb(254 242 242 / .5)"], blue: ["#60a5fa", "rgb(239 246 255 / .5)"] };
+function quoteStyle(it) {
+  const c = (it.color || "").toLowerCase();
+  if (/^#[0-9a-f]{6}$/.test(c)) return `border-left-color:${c};background-color:${c}15`;
+  if (NAMED[c]) return `border-left-color:${NAMED[c][0]}`;
+  return null;
+}
 
+function avatarEl(cls) {
+  const a = state.ctx.avatar;
+  return a ? el("img", { class: "avatar" + (cls ? " " + cls : ""), src: a, alt: "", loading: "lazy" }) : el("span", { class: "avatar" + (cls ? " " + cls : "") });
+}
 function renderItem(it) {
-  const quote = it.exact ? el("blockquote", it.color ? { style: `border-left-color:${/^#?[0-9a-f]{3,8}$|^[a-z]+$/i.test(it.color) ? (it.color.startsWith("#") || /^[a-z]+$/i.test(it.color) ? it.color : "#" + it.color) : ""}` } : null,
-    el("a", { class: "jump", href: textFragmentUrl(it), rel: "noopener", target: "_blank", title: "Open the passage in the article" },
+  const prof = `https://bsky.app/profile/${state.ctx.did}`;
+  const head = el("div", { class: "head" },
+    el("a", { href: prof, rel: "noopener", target: "_blank", "aria-hidden": "true", tabindex: "-1" }, avatarEl()),
+    el("div", { class: "meta" },
+      el("a", { class: "name", href: prof, rel: "noopener", target: "_blank", text: state.ctx.name }),
+      el("span", { class: "handle", text: "@" + state.ctx.handle }),
+      el("span", { class: "sep", text: "·" }),
+      el("time", { datetime: it.createdAt, title: new Date(it.createdAt).toLocaleString(), text: relTime(it.createdAt) })));
+  const quote = it.exact ? el("blockquote", { class: it.kind === "highlight" ? "hl" : null, style: quoteStyle(it) },
+    el("a", { href: textFragmentUrl(it), rel: "noopener", target: "_blank", title: "Open this passage in the page" },
       it.prefix ? el("span", { class: "ctx", text: shortCtx(it.prefix, true) + " " }) : null,
-      el("mark", { text: it.exact }),
+      el("span", { text: `“${it.exact}”` }),
       it.suffix ? el("span", { class: "ctx", text: " " + shortCtx(it.suffix, false) }) : null)) : null;
   const body = it.body.trim() ? el("p", { class: "body" }, linkify(it.body.trim())) : null;
   const tags = it.tags.length ? el("div", { class: "tags" }, ...it.tags.map((t) => el("span", { text: "#" + t }))) : null;
-  const meta = el("div", { class: "meta" },
-    el("span", { class: "kind", text: it.kind }),
-    el("time", { datetime: it.createdAt, text: fmtDate(it.createdAt) }),
-    el("a", { href: `https://pdsls.dev/${it.uri}`, rel: "noopener", target: "_blank", title: it.uri, text: "record" }));
-  return el("li", { "data-kind": it.kind }, quote, body, tags, meta);
+  const actions = el("div", { class: "actions" },
+    el("a", { class: "ghost", href: textFragmentUrl(it), rel: "noopener", target: "_blank", title: "Open in page", html: ICON.open + "<span>Open in page</span>" }),
+    el("a", { class: "ghost", href: `https://pdsls.dev/${it.uri}`, rel: "noopener", target: "_blank", title: it.uri, html: ICON.code + "<span>Record</span>" }),
+    el("span", { class: "badge", text: it.kind === "highlight" ? "Highlight" : "Annotation" }));
+  return el("li", null, el("article", { class: "card note" }, head, el("div", { class: "content" }, quote, body, tags), actions));
 }
 
 function markdown(items, ctx) {
-  const lines = [`# ${ctx.title}`, "", `<${ctx.source}>`, "", `Margin notes by @${ctx.handle || ctx.did}`, ""];
+  const lines = [`# ${ctx.title}`, "", `<${ctx.source}>`, "", `Margin notes by @${ctx.handle}`, ""];
   for (const it of items) {
     if (it.exact) lines.push(it.exact.split("\n").map((l) => "> " + l).join("\n"));
     if (it.body.trim()) lines.push("", it.body.trim());
@@ -299,8 +393,8 @@ function draw() {
   let items = state.items.filter((i) => state.filter === "all" || i.kind === state.filter);
   items = items.slice().sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1) * (state.asc ? 1 : -1));
   items.forEach((it) => list.append(renderItem(it)));
-  const n = state.items.filter((i) => i.kind === "note").length, h = state.items.length - n;
-  $("count").textContent = `${n} note${n === 1 ? "" : "s"} · ${h} highlight${h === 1 ? "" : "s"}`;
+  const n = state.items.filter((i) => i.kind === "note").length;
+  $("n-all").textContent = state.items.length; $("n-notes").textContent = n; $("n-hl").textContent = state.items.length - n;
   $("sort").textContent = state.asc ? "Oldest first" : "Newest first";
   for (const [id, f] of [["f-all", "all"], ["f-notes", "note"], ["f-hl", "highlight"]]) $(id).setAttribute("aria-pressed", String(state.filter === f));
 }
@@ -308,6 +402,7 @@ $("f-all").onclick = () => { state.filter = "all"; draw(); };
 $("f-notes").onclick = () => { state.filter = "note"; draw(); };
 $("f-hl").onclick = () => { state.filter = "highlight"; draw(); };
 $("sort").onclick = () => { state.asc = !state.asc; draw(); };
+$("ctx").onclick = () => { const on = document.body.classList.toggle("show-ctx"); $("ctx").setAttribute("aria-pressed", String(on)); };
 $("md").onclick = async () => {
   const items = state.items.slice().sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
   try { await navigator.clipboard.writeText(markdown(items, state.ctx)); $("md").textContent = "Copied"; }
@@ -340,9 +435,9 @@ async function run() {
   $("in-h").value = h; $("in-url").value = url;
   $("notes").replaceChildren(); $("pages").replaceChildren(); $("bar").hidden = true;
   if (!h) { $("view").hidden = true; $("maker").hidden = false; status(""); return; }
-  $("view").hidden = false;
-  $("maker").hidden = true;
-  $("title").textContent = ""; $("src").textContent = ""; $("byline").replaceChildren();
+  $("view").hidden = false; $("maker").hidden = true;
+  $("title").textContent = ""; $("src").replaceChildren(); $("byline").replaceChildren();
+  $("notes").append(el("li", null, el("div", { class: "skeleton" })), el("li", null, el("div", { class: "skeleton" })));
   try {
     status("Resolving account…");
     const actor = await resolveActor(h);
@@ -351,14 +446,14 @@ async function run() {
     const recs = (await Promise.all(COLLECTIONS.map((c) =>
       listAll(actor.pds, actor.did, c, (n) => { counts[c] = n; status(`Reading records… ${Object.values(counts).reduce((a, b) => a + b, 0)}`); })
         .catch((err) => { if (/40[04]/.test(err.message)) return []; throw err; })))).flat();
+    $("notes").replaceChildren();
     const all = recs.map(toItem).filter((i) => i.source);
     const p = await prof;
     const handle = actor.handle || (p && p.handle) || actor.did;
-    $("byline").replaceChildren(
-      p && p.avatar ? el("img", { src: p.avatar, alt: "" }) : null,
-      el("span", null, el("a", { href: `https://bsky.app/profile/${actor.did}`, rel: "noopener", target: "_blank", text: (p && p.displayName) || handle }),
-        el("span", { class: "h", text: "@" + handle })));
-    state.ctx = { did: actor.did, handle };
+    state.ctx = { did: actor.did, handle, name: (p && p.displayName) || handle, avatar: p && p.avatar };
+    const profUrl = `https://bsky.app/profile/${actor.did}`;
+    $("byline").replaceChildren(avatarEl(),
+      el("div", null, el("a", { class: "name", href: profUrl, rel: "noopener", target: "_blank", text: state.ctx.name }), el("div", { class: "handle", text: "@" + handle })));
 
     if (!url) {
       // Index mode: every page this person has annotated.
@@ -370,13 +465,14 @@ async function run() {
       }
       const sorted = [...groups.values()].sort((a, b) => (a.last < b.last ? 1 : -1));
       $("title").textContent = "Annotated pages";
-      document.title = `Margin · @${handle}`;
-      $("src").textContent = `${sorted.length} pages · ${all.length} records`;
+      document.title = `Margin notes · @${handle}`;
+      $("src").textContent = `${sorted.length} pages · ${all.length} notes and highlights`;
       for (const g of sorted) {
         const n = g.items.filter((i) => i.kind === "note").length;
-        $("pages").append(el("li", null, el("a", { href: shareLink(h, g.source) },
+        $("pages").append(el("li", null, el("a", { class: "card", href: shareLink(h, g.source) },
           el("span", { class: "t", text: g.title || g.source.replace(/^https?:\/\//, "") }),
-          el("span", { class: "u", text: `${n} notes · ${g.items.length - n} highlights · ${g.source}` }))));
+          el("span", { class: "u", text: g.source.replace(/^https?:\/\//, "") }),
+          el("span", { class: "c", text: `${n} annotation${n === 1 ? "" : "s"} · ${g.items.length - n} highlight${g.items.length - n === 1 ? "" : "s"} · ${relTime(g.last)}` }))));
       }
       status(sorted.length ? "" : "No Margin records found for this account.");
       return;
@@ -386,13 +482,14 @@ async function run() {
     state.items = all.filter((i) => i.key === key);
     const title = (state.items.find((i) => i.title) || {}).title || url.replace(/^https?:\/\//, "");
     const source = (state.items[0] || {}).source || url;
-    state.ctx.title = title; state.ctx.source = source;
+    Object.assign(state.ctx, { title, source });
     document.title = `${title} · Margin notes by @${handle}`;
     $("title").replaceChildren(el("a", { href: source, rel: "noopener", target: "_blank", text: title }));
-    $("src").replaceChildren(el("a", { href: source, rel: "noopener", target: "_blank", text: source }));
+    $("src").replaceChildren(el("span", { html: ICON.link }), el("a", { href: source, rel: "noopener", target: "_blank", text: source.replace(/^https?:\/\//, "") }));
     if (!state.items.length) { status(`@${handle} has no Margin notes or highlights on this page.`); return; }
     $("bar").hidden = false; status(""); draw();
   } catch (err) {
+    $("notes").replaceChildren();
     status(`Couldn’t load: ${err.message}`, true);
     $("maker").hidden = false;
   }
