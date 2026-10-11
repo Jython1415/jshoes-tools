@@ -2,6 +2,30 @@
   "version": 1,
   "shortcuts": [
     {
+      "id": "relay-texts-all-a",
+      "title": "Relay Texts (all messages) (test A)",
+      "detail": "Experimental: catches every message, including one-word replies. Turn off the old Relay Texts first.",
+      "url": "https://joshuashew.com/kit/shortcuts/relay-texts-all-a.shortcut?v=1",
+      "utility": "relay-message",
+      "version": 1
+    },
+    {
+      "id": "relay-texts-all-b",
+      "title": "Relay Texts (all messages) (test B)",
+      "detail": "Experimental: catches every message, including one-word replies. Turn off the old Relay Texts first.",
+      "url": "https://joshuashew.com/kit/shortcuts/relay-texts-all-b.shortcut?v=1",
+      "utility": "relay-message",
+      "version": 1
+    },
+    {
+      "id": "relay-texts-sentinel",
+      "title": "Relay Texts (sentinel catch)",
+      "detail": "Companion to 'all messages': catches the rare text containing its marker. Keep both on.",
+      "url": "https://joshuashew.com/kit/shortcuts/relay-texts-sentinel.shortcut?v=1",
+      "utility": "relay-message",
+      "version": 1
+    },
+    {
       "id": "relay-texts",
       "title": "Relay Texts",
       "detail": "Sends every text you get to your message archive. Turn on its automation after installing.",
