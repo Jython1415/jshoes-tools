@@ -1,4 +1,21 @@
 {
   "version": 1,
-  "shortcuts": []
+  "shortcuts": [
+    {
+      "id": "relay-texts",
+      "title": "Relay Texts",
+      "detail": "Sends every text you get to your message archive. Turn on its automation after installing.",
+      "url": "https://joshuashew.com/kit/shortcuts/relay-texts.shortcut?v=1",
+      "utility": "relay-message",
+      "version": 1
+    },
+    {
+      "id": "relay-texts-notification",
+      "title": "Relay Texts (Notification trigger)",
+      "detail": "Experimental alternative that reads Messages notifications. Turn on only one of the two.",
+      "url": "https://joshuashew.com/kit/shortcuts/relay-texts-notification.shortcut?v=1",
+      "utility": "relay-message",
+      "version": 1
+    }
+  ]
 }
