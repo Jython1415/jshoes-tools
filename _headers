@@ -1,0 +1,10 @@
+# Signed Shortcuts files for the Kit app's "Install shortcuts" list (kit/shortcuts.json).
+# Served as a download; the filename sets the shortcut's name on import, because signing
+# strips the name from inside the file. Source and signing: kit-ios shortcuts/README.md.
+/kit/shortcuts/relay-texts.shortcut
+  Content-Type: application/octet-stream
+  Content-Disposition: attachment; filename="Relay Texts.shortcut"
+
+/kit/shortcuts/relay-texts-notification.shortcut
+  Content-Type: application/octet-stream
+  Content-Disposition: attachment; filename="Relay Texts (Notification trigger).shortcut"
