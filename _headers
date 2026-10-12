@@ -8,3 +8,15 @@
 /kit/shortcuts/relay-texts-notification.shortcut
   Content-Type: application/octet-stream
   Content-Disposition: attachment; filename="Relay Texts (Notification trigger).shortcut"
+
+# Forward Codes shortcuts (/forward-codes/). Source and signing: kit-ios forward-codes/README.md.
+/forward-codes/*
+  X-Robots-Tag: noindex, nofollow
+
+/forward-codes/forward-codes-to-ayumi.shortcut
+  Content-Type: application/octet-stream
+  Content-Disposition: attachment; filename="Forward Codes to Ayumi.shortcut"
+
+/forward-codes/forward-codes-to-joshua.shortcut
+  Content-Type: application/octet-stream
+  Content-Disposition: attachment; filename="Forward Codes to Joshua.shortcut"
