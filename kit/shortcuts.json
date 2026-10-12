@@ -2,44 +2,20 @@
   "version": 1,
   "shortcuts": [
     {
-      "id": "relay-texts-all-a",
-      "title": "Relay Texts (all messages) (test A)",
-      "detail": "Experimental: catches every message, including one-word replies. Turn off the old Relay Texts first.",
-      "url": "https://joshuashew.com/kit/shortcuts/relay-texts-all-a.shortcut?v=1",
-      "utility": "relay-message",
-      "version": 1
-    },
-    {
-      "id": "relay-texts-all-b",
-      "title": "Relay Texts (all messages) (test B)",
-      "detail": "Experimental: catches every message, including one-word replies. Turn off the old Relay Texts first.",
-      "url": "https://joshuashew.com/kit/shortcuts/relay-texts-all-b.shortcut?v=1",
-      "utility": "relay-message",
-      "version": 1
-    },
-    {
-      "id": "relay-texts-sentinel",
-      "title": "Relay Texts (sentinel catch)",
-      "detail": "Companion to 'all messages': catches the rare text containing its marker. Keep both on.",
-      "url": "https://joshuashew.com/kit/shortcuts/relay-texts-sentinel.shortcut?v=1",
-      "utility": "relay-message",
-      "version": 1
-    },
-    {
       "id": "relay-texts",
       "title": "Relay Texts",
-      "detail": "Sends every text you get to your message archive. Turn on its automation after installing.",
-      "url": "https://joshuashew.com/kit/shortcuts/relay-texts.shortcut?v=1",
+      "detail": "Covers muted conversations. Turn its automation on after installing, and keep it on alongside the Notification one.",
+      "url": "https://joshuashew.com/kit/shortcuts/relay-texts.shortcut?v=2",
       "utility": "relay-message",
-      "version": 1
+      "version": 2
     },
     {
       "id": "relay-texts-notification",
       "title": "Relay Texts (Notification trigger)",
-      "detail": "Experimental alternative that reads Messages notifications. Turn on only one of the two.",
-      "url": "https://joshuashew.com/kit/shortcuts/relay-texts-notification.shortcut?v=1",
+      "detail": "Relays every message that notifies, whatever it says. Keep it on alongside Relay Texts.",
+      "url": "https://joshuashew.com/kit/shortcuts/relay-texts-notification.shortcut?v=2",
       "utility": "relay-message",
-      "version": 1
+      "version": 2
     }
   ]
 }
