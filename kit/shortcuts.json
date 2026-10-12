@@ -5,17 +5,17 @@
       "id": "relay-texts",
       "title": "Relay Texts",
       "detail": "Covers muted conversations. Turn its automation on after installing, and keep it on alongside the Notification one.",
-      "url": "https://joshuashew.com/kit/shortcuts/relay-texts.shortcut?v=2",
+      "url": "https://joshuashew.com/kit/shortcuts/relay-texts.shortcut?v=3",
       "utility": "relay-message",
-      "version": 2
+      "version": 3
     },
     {
       "id": "relay-texts-notification",
       "title": "Relay Texts (Notification trigger)",
       "detail": "Relays every message that notifies, whatever it says. Keep it on alongside Relay Texts.",
-      "url": "https://joshuashew.com/kit/shortcuts/relay-texts-notification.shortcut?v=2",
+      "url": "https://joshuashew.com/kit/shortcuts/relay-texts-notification.shortcut?v=3",
       "utility": "relay-message",
-      "version": 2
+      "version": 3
     }
   ]
 }
