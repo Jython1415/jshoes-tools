@@ -10,13 +10,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@600;700&family=Source+Serif+4:opsz,wght@8..60,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/site-bar.css">
 <style>
 :root{--paper:#E7EAE5;--ink:#161D1F;--ink-2:#4F5B58;--ink-3:#77827E;--rule:#C4CCC2;--brick:#B4553E;--stone:#4F7189;--marsh:#557044}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#12171A;--ink:#E2E7E3;--ink-2:#A3AFAB;--ink-3:#7C8783;--rule:#333C40;--brick:#DB7A61;--stone:#7FA6C0;--marsh:#84A870}}
 :root[data-theme="dark"]{--paper:#12171A;--ink:#E2E7E3;--ink-2:#A3AFAB;--ink-3:#7C8783;--rule:#333C40;--brick:#DB7A61;--stone:#7FA6C0;--marsh:#84A870}
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:"Source Serif 4",Georgia,serif;font-size:17px;line-height:1.6;
-  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1.4rem}
+  min-height:100vh;display:flex;flex-direction:column}
+main{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem 1.4rem}
 .box{max-width:44ch}
 .code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase}
 h1{font-family:"Zilla Slab",Rockwell,Georgia,serif;font-weight:700;font-size:clamp(1.8rem,6vw,2.6rem);margin:.6rem 0 0;line-height:1.05;letter-spacing:-.02em}
@@ -28,6 +30,8 @@ a:focus-visible{outline:2px solid var(--stone);outline-offset:3px;border-radius:
 </style>
 </head>
 <body>
+<header class="site-bar" style="--sb-max:720px;--sb-pad:1.4rem"><nav aria-label="Site"><a class="sb-home" href="/">joshuashew.com</a><a href="/artifacts/">Artifacts</a><a href="/tools/">Tools</a></nav></header>
+<main>
 <div class="box">
   <p class="code">404</p>
   <h1>Nothing here</h1>
@@ -36,5 +40,6 @@ a:focus-visible{outline:2px solid var(--stone);outline-offset:3px;border-radius:
   </div>
   <p>That page doesn&rsquo;t exist, or it moved. Start from <a href="/">joshuashew.com</a>, or go straight to the <a href="/artifacts/">artifacts</a>.</p>
 </div>
+</main>
 </body>
 </html>

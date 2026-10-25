@@ -23,6 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/site-bar.css">
 <style>
 :root{
   --paper:#E7EAE5; --surface:#F2F4F0; --ink:#161D1F; --ink-2:#4F5B58; --ink-3:#77827E;
@@ -45,7 +46,7 @@ body{
   font-family:"Source Serif 4",Georgia,serif;font-size:17px;line-height:1.6;
   -webkit-font-smoothing:antialiased;
 }
-.wrap{max-width:720px;margin:0 auto;padding:clamp(3rem,9vw,6rem) 1.4rem 4rem}
+.wrap{max-width:720px;margin:0 auto;padding:clamp(2.4rem,7vw,4.5rem) 1.4rem 4rem}
 h1{
   font-family:"Zilla Slab",Rockwell,Georgia,serif;font-weight:700;
   font-size:clamp(2.2rem,7vw,3.2rem);line-height:1;letter-spacing:-.02em;margin:0;
@@ -58,6 +59,8 @@ h2{
   letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);
   font-weight:500;margin:3.2rem 0 1rem;
 }
+h2 a{color:inherit;text-decoration:none}
+h2 a:hover,h2 a:focus-visible{color:var(--brick)}
 ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.9rem}
 li a{
   display:block;background:var(--surface);border:1px solid var(--rule-soft);
@@ -80,6 +83,7 @@ footer a{color:var(--brick)}
 </style>
 </head>
 <body>
+<header class="site-bar" style="--sb-max:720px;--sb-pad:1.4rem"><nav aria-label="Site"><a class="sb-home" href="/" aria-current="page">joshuashew.com</a><a href="/artifacts/">Artifacts</a><a href="/tools/">Tools</a></nav></header>
 <div class="wrap">
   <h1>Joshua Shew</h1>
   <p class="tag">A place to put things that should have a stable URL.</p>
@@ -87,7 +91,7 @@ footer a{color:var(--brick)}
     <i style="background:var(--marsh)"></i><i style="background:#B0801F"></i><i style="background:#565C59"></i><i style="background:var(--brick)"></i><i style="background:var(--stone)"></i>
   </div>
 
-  <h2>Artifacts</h2>
+  <h2><a href="/artifacts/">Artifacts</a></h2>
   <ul>
     <li><a href="/artifacts/allston/">
       <span class="t">The Allston Strata</span>
@@ -96,12 +100,17 @@ footer a{color:var(--brick)}
     </a></li>
   </ul>
 
-  <h2>Tools</h2>
+  <h2><a href="/tools/">Tools</a></h2>
   <ul>
     <li><a href="/transcript/">
       <span class="t">MacAskill · 80,000 Hours transcript</span>
       <span class="d">Three-section synchronized transcript viewer with speaker attribution.</span>
       <span class="u">/transcript/</span>
+    </a></li>
+    <li><a href="/margin/">
+      <span class="t">Margin notes</span>
+      <span class="d">One person&rsquo;s Margin annotations and highlights on a web page, read live from their AT Protocol repository.</span>
+      <span class="u">/margin/</span>
     </a></li>
   </ul>
 
