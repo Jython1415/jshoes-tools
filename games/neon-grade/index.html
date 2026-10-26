@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Neon Grade</title>
+<meta name="description" content="Steer a ball down an endless neon slope. Scores post to Bluesky.">
+<meta property="og:title" content="Neon Grade">
+<meta property="og:description" content="Steer a ball down an endless neon slope. Scores post to Bluesky.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://joshuashew.com/games/neon-grade/">
+<meta property="og:image" content="https://joshuashew.com/games/neon-grade/social-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A glowing ball rolling down a neon grid track between magenta blocks">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://joshuashew.com/games/neon-grade/social-card.png">
+<meta name="theme-color" content="#1B1A33">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231B1A33'/%3E%3Cpath d='M4 26 L28 6' stroke='%234ACBE1' stroke-width='3'/%3E%3Ccircle cx='12' cy='15' r='5' fill='none' stroke='%23ffffff' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Share+Tech+Mono&display=swap">
+<link rel="stylesheet" href="/site-bar.css">
+<style>
+/* Layout: full-bleed WebGL canvas; the menu, board and results are opaque or translucent panels over it. */
+:root {
+  --menu-top: #4A4E62;
+  --menu-bottom: #1B1A33;
+  --cyan: #4ACBE1;
+  --hint: #93D9EF;
+  --pink: #FD85EF;
+  --violet: #7646C8;
+  --ink: #ffffff;
+  --muted: #9aa1b8;
+  --title: "Orbitron", "Eurostile", "Segoe UI", system-ui, sans-serif;
+  --mono: "Share Tech Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: #0a1a26; color: var(--ink); font-family: var(--mono);
+  overflow: hidden; touch-action: none; -webkit-user-select: none; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+#stage { position: fixed; inset: 0; width: 100%; height: 100%; display: block; outline: none; }
+[hidden] { display: none !important; }
+.site-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 30; padding-top: env(safe-area-inset-top, 0px); }
+body.playing .site-bar { display: none; }
+
+/* ---- shared slanted outline (the original's parallelogram buttons) ---- */
+.slant {
+  --cut: 18px; --bw: 3px;
+  position: relative; display: grid; place-items: center;
+  background: linear-gradient(90deg, var(--violet), var(--cyan));
+  clip-path: polygon(0 0, 100% 0, calc(100% - var(--cut)) 100%, 0 100%);
+  padding: var(--bw); border: 0; cursor: pointer; color: var(--cyan);
+  font: 800 clamp(20px, 4.6vw, 30px)/1 var(--title); letter-spacing: 0.08em; text-transform: uppercase;
+  text-decoration: none;
+}
+.slant > span {
+  display: grid; place-items: center; width: 100%; height: 100%;
+  background: var(--fill, #262841);
+  clip-path: polygon(0 0, 100% 0, calc(100% - var(--cut) + 1px) 100%, 0 100%);
+  padding: 0.55em 0.8em;
+}
+.slant:hover > span, .slant:focus-visible > span { background: #30335a; }
+.slant:focus-visible { outline: none; filter: drop-shadow(0 0 8px var(--cyan)); }
+.slant.big { font-size: clamp(30px, 8vw, 54px); }
+.slant.small { font-size: clamp(14px, 3.4vw, 18px); --cut: 12px; }
+
+/* ---- menu & board screens ---- */
+.screen {
+  position: fixed; inset: 0; z-index: 20; overflow-y: auto;
+  background: linear-gradient(180deg, var(--menu-top), var(--menu-bottom));
+  padding: calc(64px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) calc(28px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  display: grid; justify-items: center; align-content: start; touch-action: pan-y;
+}
+.col { width: min(460px, 100%); display: grid; gap: 22px; }
+.game-title {
+  margin: 4px 0 6px; text-align: center; color: var(--cyan);
+  font: 900 clamp(38px, 11vw, 74px)/1 var(--title); letter-spacing: 0.08em; text-transform: uppercase;
+  text-shadow: 0 0 18px rgba(74, 203, 225, 0.35);
+}
+.label { color: #b9bccb; font: 600 clamp(13px, 3.2vw, 16px)/1 var(--title); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px; }
+.field { --fill: #262841; cursor: text; }
+.field > span { padding: 0; place-items: stretch; }
+.field input {
+  width: 100%; min-width: 0; background: transparent; border: 0; outline: none; color: var(--ink);
+  font: 600 clamp(16px, 4vw, 22px)/1 var(--mono); padding: 0.75em 3.2em 0.75em 0.8em; letter-spacing: 0.04em;
+}
+.field input::placeholder { color: #7d8199; }
+.field-row { position: relative; }
+.field-go {
+  position: absolute; right: 26px; top: 50%; transform: translateY(-50%);
+  background: none; border: 0; color: var(--cyan); font: 800 14px/1 var(--title); letter-spacing: 0.1em; cursor: pointer; padding: 10px 6px;
+}
+.field-go:focus-visible { outline: 2px solid var(--cyan); border-radius: 2px; }
+.who { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--ink); font: 600 clamp(16px, 4vw, 20px)/1.2 var(--mono); padding: 14px 0 4px; border-bottom: 2px solid rgba(74, 203, 225, 0.35); }
+.who b { color: var(--cyan); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.linkish { background: none; border: 0; color: var(--muted); font: 500 13px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; padding: 6px 0; flex: none; }
+.linkish:hover { color: var(--ink); }
+.note { color: var(--muted); font-size: 13px; line-height: 1.5; min-height: 1.5em; margin: -10px 0 0; }
+.note.err { color: var(--pink); }
+.menu-btns { display: grid; gap: 22px; }
+.more { justify-self: center; width: min(320px, 80%); }
+.corner { position: fixed; z-index: 25; }
+.sound { top: calc(58px + env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); background: none; border: 0; color: var(--cyan); cursor: pointer; padding: 6px; }
+body.playing .sound { top: calc(12px + env(safe-area-inset-top, 0px)); }
+.sound:focus-visible { outline: 2px solid var(--cyan); border-radius: 4px; }
+.sound svg { width: 30px; height: 30px; display: block; }
+.version { bottom: calc(10px + env(safe-area-inset-bottom, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); color: #6d7088; font: 600 13px/1 var(--mono); }
+
+/* ---- leaderboard ---- */
+.board-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.board-head h2 { margin: 0; color: var(--cyan); font: 900 clamp(26px, 7vw, 40px)/1 var(--title); letter-spacing: 0.08em; text-transform: uppercase; }
+.rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; font-variant-numeric: tabular-nums; }
+.rows li { display: grid; grid-template-columns: 3.2ch minmax(0, 1fr) auto; gap: 12px; align-items: baseline; padding: 9px 10px; background: rgba(15, 16, 34, 0.45); font-size: clamp(15px, 3.8vw, 18px); }
+.rows li .h { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rows li .h a { color: inherit; text-decoration: none; }
+.rows li .h a:hover { text-decoration: underline; }
+.rows li .n { color: var(--muted); }
+.rows li .v { color: var(--ink); font-family: var(--title); font-weight: 800; }
+.rows li.me { background: rgba(74, 203, 225, 0.16); box-shadow: inset 3px 0 0 var(--cyan); }
+.rows li:nth-child(-n+3) .n { color: var(--cyan); }
+
+/* ---- in-game HUD ---- */
+.score {
+  position: fixed; top: calc(14px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); z-index: 10;
+  font: 900 clamp(40px, 9vw, 64px)/1 var(--title); color: #fff; letter-spacing: 0.04em; font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 12px rgba(0, 0, 0, 0.6); pointer-events: none;
+}
+.hint {
+  position: fixed; left: 50%; top: 26%; transform: translateX(-50%); z-index: 10; pointer-events: none;
+  color: var(--hint); font: 600 clamp(16px, 3.6vw, 24px)/1.2 var(--title); letter-spacing: 0.04em; text-align: center; white-space: nowrap;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.7); transition: opacity 0.5s;
+}
+.speedup {
+  position: fixed; left: 50%; bottom: calc(4% + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 10; pointer-events: none;
+  color: var(--pink); font: 900 clamp(24px, 6vw, 40px)/1 var(--title); letter-spacing: 0.12em; text-transform: uppercase;
+  text-shadow: 0 0 16px rgba(253, 133, 239, 0.7); opacity: 0; transition: opacity 0.25s;
+}
+.speedup.on { opacity: 1; }
+.pausebtn { top: calc(12px + env(safe-area-inset-top, 0px)); left: max(16px, env(safe-area-inset-left, 0px)); background: none; border: 0; color: rgba(255,255,255,0.75); cursor: pointer; padding: 8px; }
+.pausebtn svg { width: 26px; height: 26px; display: block; }
+.pausebtn:focus-visible { outline: 2px solid var(--cyan); border-radius: 4px; }
+.arrow {
+  position: fixed; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); z-index: 10; width: 84px; height: 84px; border-radius: 50%;
+  border: 2px solid rgba(147, 217, 239, 0.55); background: rgba(10, 26, 38, 0.35); color: var(--hint);
+  display: grid; place-items: center; touch-action: none;
+}
+.arrow svg { width: 38px; height: 38px; }
+.arrow.l { left: max(18px, env(safe-area-inset-left, 0px)); }
+.arrow.r { right: max(18px, env(safe-area-inset-right, 0px)); }
+.arrow.on { background: rgba(74, 203, 225, 0.3); }
+@media (hover: hover) and (pointer: fine) { .arrow { display: none; } }
+
+/* ---- results and pause panels (over the 3D scene, like the original) ---- */
+.panelwrap { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); background: rgba(10, 12, 28, 0.45); }
+.panel {
+  width: min(420px, 100%); display: grid; gap: 18px; padding: 26px 24px 24px;
+  background: linear-gradient(180deg, rgba(74, 78, 98, 0.92), rgba(27, 26, 51, 0.94));
+  border: 2px solid; border-image: linear-gradient(90deg, var(--violet), var(--cyan)) 1;
+}
+.panel h2 { margin: 0; text-align: center; color: var(--cyan); font: 900 clamp(26px, 7vw, 38px)/1 var(--title); letter-spacing: 0.1em; text-transform: uppercase; }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: center; }
+.stats .k { color: #b9bccb; font: 600 12px/1 var(--title); letter-spacing: 0.16em; text-transform: uppercase; }
+.stats .v { font: 900 clamp(34px, 9vw, 48px)/1.1 var(--title); font-variant-numeric: tabular-nums; }
+.stats .v.new { color: var(--cyan); text-shadow: 0 0 14px rgba(74, 203, 225, 0.6); }
+.status { text-align: center; color: var(--muted); font-size: 14px; line-height: 1.5; min-height: 1.5em; margin: 0; }
+.status.ok { color: var(--hint); }
+.status.err { color: var(--pink); }
+.status button { background: none; border: 0; color: var(--cyan); font: inherit; text-decoration: underline; cursor: pointer; padding: 0 2px; }
+.btnrow { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (prefers-reduced-motion: reduce) { .hint, .speedup { transition: none; } }
+</style>
+</head>
+<body>
+<header class="site-bar" data-sb-theme="dark" style="--sb-max:960px;--sb-pad:1.4rem"><nav aria-label="Site"><a class="sb-home" href="/">joshuashew.com</a><a href="/tools/">Tools</a><a href="/artifacts/">Artifacts</a><a href="/games/" aria-current="page">Games</a></nav></header>
+
+<canvas id="stage" tabindex="0" aria-label="Game view"></canvas>
+
+<div class="score" id="score" hidden>0</div>
+<div class="hint" id="hint" hidden>Steer with arrows or a/d</div>
+<div class="speedup" id="speedup" aria-hidden="true">Speed up</div>
+<button class="corner pausebtn" id="pauseBtn" type="button" aria-label="Pause" hidden><svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="4" width="5" height="16"/><rect x="14" y="4" width="5" height="16"/></svg></button>
+<div class="arrow l" id="arrowL" hidden aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M15 4 7 12l8 8"/></svg></div>
+<div class="arrow r" id="arrowR" hidden aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m9 4 8 8-8 8"/></svg></div>
+<button class="corner sound" id="soundBtn" type="button" aria-label="Sound on" aria-pressed="true">
+  <svg viewBox="0 0 32 32" fill="currentColor"><path d="M17 5 9 12H4v8h5l8 7z"/><path id="soundWaves" d="M21 11a7 7 0 0 1 0 10M24.5 7.5a12 12 0 0 1 0 17" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path id="soundOff" d="m21 12 8 8m0-8-8 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" hidden/></svg>
+</button>
+<div class="corner version" id="version">0.1</div>
+
+<section class="screen" id="menu" aria-label="Menu">
+  <div class="col">
+    <h1 class="game-title">Neon Grade</h1>
+    <div id="signedOut">
+      <div class="label"><label for="handle">Bluesky handle:</label></div>
+      <div class="field-row">
+        <div class="slant field"><span><input id="handle" type="text" inputmode="email" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="..."></span></div>
+        <button class="field-go" id="signInBtn" type="button">Sign in</button>
+      </div>
+    </div>
+    <div id="signedIn" class="who" hidden><b id="whoHandle"></b><button class="linkish" id="signOutBtn" type="button">Sign out</button></div>
+    <p class="note" id="authNote"></p>
+    <div class="menu-btns">
+      <button class="slant big" id="playBtn" type="button"><span>Play</span></button>
+      <button class="slant" id="boardBtn" type="button"><span>Leaderboard</span></button>
+    </div>
+    <a class="slant small more" href="/games/"><span>More games</span></a>
+  </div>
+</section>
+
+<section class="screen" id="board" aria-label="Leaderboard" hidden>
+  <div class="col">
+    <div class="board-head"><h2>Leaderboard</h2><button class="linkish" id="boardRefresh" type="button">Refresh</button></div>
+    <p class="note" id="boardNote"></p>
+    <ol class="rows" id="boardRows"></ol>
+    <button class="slant" id="boardBack" type="button"><span>Back</span></button>
+  </div>
+</section>
+
+<div class="panelwrap" id="over" hidden>
+  <div class="panel" role="dialog" aria-label="Run over">
+    <h2>Game over</h2>
+    <div class="stats">
+      <div><div class="k">Score</div><div class="v" id="finalScore">0</div></div>
+      <div><div class="k">Best</div><div class="v" id="finalBest">0</div></div>
+    </div>
+    <p class="status" id="postStatus"></p>
+    <div class="btnrow">
+      <button class="slant small" id="menuBtn" type="button"><span>Menu</span></button>
+      <button class="slant small" id="againBtn" type="button"><span>Again</span></button>
+    </div>
+  </div>
+</div>
+
+<div class="panelwrap" id="paused" hidden>
+  <div class="panel" role="dialog" aria-label="Paused">
+    <h2>Paused</h2>
+    <div class="btnrow">
+      <button class="slant small" id="quitBtn" type="button"><span>Menu</span></button>
+      <button class="slant small" id="resumeBtn" type="button"><span>Resume</span></button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="sim.js"></script>
+<script src="game.js"></script>
+<script type="module">
+  import { createScores } from "./atp.js";
+  window.NGScores = createScores;
+  window.dispatchEvent(new Event("ng-scores-ready"));
+</script>
+</body>
+</html>

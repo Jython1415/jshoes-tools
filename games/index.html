@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Games — joshuashew.com</title>
+<meta name="description" content="Browser games published at joshuashew.com. Scores post to Bluesky.">
+<link rel="canonical" href="https://joshuashew.com/games/">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2032%2032%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%225%22%20fill%3D%22%23E7EAE5%22/%3E%3Crect%20x%3D%225%22%20y%3D%225%22%20width%3D%2222%22%20height%3D%224%22%20fill%3D%22%23557044%22/%3E%3Crect%20x%3D%225%22%20y%3D%229%22%20width%3D%2222%22%20height%3D%223%22%20fill%3D%22%23B0801F%22/%3E%3Crect%20x%3D%225%22%20y%3D%2212%22%20width%3D%2222%22%20height%3D%224%22%20fill%3D%22%23565C59%22/%3E%3Crect%20x%3D%225%22%20y%3D%2216%22%20width%3D%2222%22%20height%3D%226%22%20fill%3D%22%23B4553E%22/%3E%3Crect%20x%3D%225%22%20y%3D%2222%22%20width%3D%2222%22%20height%3D%225%22%20fill%3D%22%234F7189%22/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://joshuashew.com/games/">
+<meta property="og:title" content="Games — joshuashew.com">
+<meta property="og:description" content="Browser games published at joshuashew.com. Scores post to Bluesky.">
+<meta property="og:image" content="https://joshuashew.com/games/social-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Games — joshuashew.com">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Games — joshuashew.com">
+<meta name="twitter:description" content="Browser games published at joshuashew.com. Scores post to Bluesky.">
+<meta name="twitter:image" content="https://joshuashew.com/games/social-card.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/site-bar.css">
+<style>
+:root{
+  --paper:#E7EAE5; --surface:#F2F4F0; --ink:#161D1F; --ink-2:#4F5B58; --ink-3:#5F6A66;
+  --rule:#C4CCC2; --rule-soft:#D5DBD2; --brick:#B4553E; --stone:#4F7189; --marsh:#557044;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#12171A; --surface:#1A2024; --ink:#E2E7E3; --ink-2:#A3AFAB; --ink-3:#97A29E;
+    --rule:#333C40; --rule-soft:#283034; --brick:#DB7A61; --stone:#7FA6C0; --marsh:#84A870;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#12171A; --surface:#1A2024; --ink:#E2E7E3; --ink-2:#A3AFAB; --ink-3:#97A29E;
+  --rule:#333C40; --rule-soft:#283034; --brick:#DB7A61; --stone:#7FA6C0; --marsh:#84A870;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Source Serif 4",Georgia,serif;font-size:17px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:720px;margin:0 auto;padding:clamp(1.8rem,5vw,3rem) 1.4rem 3rem}
+.me{display:flex;align-items:center;gap:1rem}
+.pics{display:flex;flex:none}
+.pics img{width:60px;height:60px;border-radius:50%;display:block;border:2px solid var(--paper);background:var(--surface)}
+.pics img+img{margin-left:-14px}
+.pics .peng{image-rendering:pixelated}
+h1{
+  font-family:"Zilla Slab",Rockwell,Georgia,serif;font-weight:700;
+  font-size:clamp(1.9rem,6vw,2.5rem);line-height:1;letter-spacing:-.02em;margin:0;
+}
+.handle{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.78rem;
+  color:var(--ink-3);text-decoration:none;display:inline-block;margin-top:.4rem;
+}
+.handle:hover,.handle:focus-visible{color:var(--brick)}
+.rule{height:3px;display:flex;margin:1.4rem 0 0;border-radius:2px;overflow:hidden}
+.rule i{flex:1}
+h2{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);
+  font-weight:500;margin:2rem 0 .3rem;
+}
+h2 a{color:inherit;text-decoration:none}
+h2 a:hover,h2 a:focus-visible{color:var(--brick)}
+.rows{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.rows li{border-bottom:1px solid var(--rule-soft)}
+.rows a{
+  display:grid;grid-template-columns:minmax(0,13rem) minmax(0,1fr);gap:.2rem 1.2rem;
+  padding:.6rem .2rem;text-decoration:none;color:inherit;align-items:baseline;
+}
+.rows .t{font-family:"Zilla Slab",Georgia,serif;font-weight:600;font-size:1.02rem;line-height:1.3}
+.rows .d{color:var(--ink-2);font-size:.9rem;line-height:1.45}
+.rows a:hover .t,.rows a:focus-visible .t{color:var(--brick)}
+.rows a:focus-visible{outline:2px solid var(--stone);outline-offset:-2px;border-radius:2px}
+@media (max-width:560px){.rows a{grid-template-columns:minmax(0,1fr)}}
+</style>
+<style>
+.wrap h1{font-size:clamp(1.8rem,5vw,2.3rem)}
+.tag{color:var(--ink-2);margin:.6rem 0 1.4rem;max-width:56ch}
+.rows .m{grid-column:2;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.7rem;color:var(--ink-3);letter-spacing:.02em}
+@media (max-width:560px){.rows .m{grid-column:1}}
+</style>
+</head>
+<body>
+<header class="site-bar" style="--sb-max:720px;--sb-pad:1.4rem"><nav aria-label="Site"><a class="sb-home" href="/">joshuashew.com</a><a href="/tools/">Tools</a><a href="/artifacts/">Artifacts</a><a href="/games/" aria-current="page">Games</a></nav></header>
+<div class="wrap">
+  <h1>Games</h1>
+  <p class="tag">Browser games. Sign in with Bluesky to put your score on the leaderboard.</p>
+  <ul class="rows">
+    <li><a href="/games/neon-grade/">
+      <span class="t">Neon Grade</span>
+      <span class="d">Steer a ball down an endless neon slope without falling off or hitting a block.</span>
+    </a></li>
+  </ul>
+</div>
+</body>
+</html>
