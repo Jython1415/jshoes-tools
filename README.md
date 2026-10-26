@@ -60,7 +60,8 @@ Pages written by Claude go under `/artifacts/` so the provenance is legible from
 jshoes-tools/
 ├── index.html              # site root
 ├── site-bar.css            # shared navigation bar (see Navigation)
-├── avatar-penguin.jpg      # home-page avatar (Bluesky profile picture)
+├── avatar-photo.jpg        # home-page avatars: headshot and penguin (EXIF stripped)
+├── avatar-penguin.png
 ├── _redirects              # old /transcript/ links → /artifacts/transcript/
 ├── 404.html
 ├── artifacts/
