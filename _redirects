@@ -1,0 +1,4 @@
+# The transcript moved under /artifacts/ on 2026-10-26; keep old links working.
+/transcript /artifacts/transcript/ 301
+/transcript/ /artifacts/transcript/ 301
+/transcript/* /artifacts/transcript/:splat 301

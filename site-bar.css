@@ -1,0 +1,34 @@
+/* Site bar: the one navigation row every public page carries.
+   Self-contained so it reads the same on pages with their own palettes and fonts.
+   Each page sets --sb-max and --sb-pad on the <header> to line the bar up with its own column.
+   A page that is always dark (the transcript) adds data-sb-theme="dark". */
+.site-bar{
+  --sb-paper:#E7EAE5; --sb-ink:#161D1F; --sb-ink-3:#5F6A66; --sb-rule:#C4CCC2;
+  --sb-brick:#B4553E; --sb-stone:#4F7189;
+  background:var(--sb-paper);border-bottom:1px solid var(--sb-rule);
+  font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:.72rem;line-height:1;letter-spacing:.1em;text-transform:uppercase;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .site-bar{
+    --sb-paper:#12171A; --sb-ink:#E2E7E3; --sb-ink-3:#97A29E; --sb-rule:#333C40;
+    --sb-brick:#DB7A61; --sb-stone:#7FA6C0;
+  }
+}
+:root[data-theme="dark"] .site-bar,
+.site-bar[data-sb-theme="dark"]{
+  --sb-paper:#12171A; --sb-ink:#E2E7E3; --sb-ink-3:#97A29E; --sb-rule:#333C40;
+  --sb-brick:#DB7A61; --sb-stone:#7FA6C0;
+}
+.site-bar nav{
+  max-width:var(--sb-max,720px);margin:0 auto;padding:0 var(--sb-pad,1.4rem);
+  display:flex;align-items:center;gap:1.4rem;min-height:2.75rem;flex-wrap:wrap;
+}
+.site-bar a{
+  color:var(--sb-ink-3);text-decoration:none;
+  padding:.85rem 0 calc(.85rem - 2px);border-bottom:2px solid transparent;
+}
+.site-bar a:hover{color:var(--sb-ink)}
+.site-bar a:focus-visible{outline:2px solid var(--sb-stone);outline-offset:2px;border-radius:2px}
+.site-bar a[aria-current]{color:var(--sb-ink);border-bottom-color:var(--sb-brick)}
+.site-bar .sb-home{color:var(--sb-ink);font-weight:500;margin-right:auto;letter-spacing:.04em;text-transform:none;font-size:.8rem}
