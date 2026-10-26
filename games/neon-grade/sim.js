@@ -96,9 +96,12 @@ var NG = (function () {
   };
   // "Five obstacle": rows of magenta pillars, always with a reachable opening.
   P.pPillars = function (vertical, sparse) {
-    var vs = this.targetSpeed(this.c.s), w = this.r(9, 11.5);
-    var lead = Math.max(14, vs * 0.75);
-    var t = this.seg(this.r(70, 110), { w: w, cx: this.shiftCx(this.c.cx + this.r(-3, 3), w), grade: this.nextGrade() });
+    var vs = this.targetSpeed(this.c.s), w = this.r(9, 11.5), c = this.c;
+    var cx = this.shiftCx(c.cx + this.r(-3, 3), w);
+    // Run-up long enough to cross from the far edge of the previous deck to the far edge of this one.
+    var span = Math.max(c.cx + c.w / 2, cx + w / 2) - Math.min(c.cx - c.w / 2, cx - w / 2);
+    var lead = Math.max(14, vs * 0.75, vs * span / (0.4 * latMax(vs)) * 0.6 + 6);
+    var t = this.seg(this.r(70, 110) + lead * 0.5, { w: w, cx: cx, grade: this.nextGrade() });
     this.rows(t, t.s0 + lead, t.s1 - 12, vertical, sparse);
   };
   P.rows = function (t, sA, sB, vertical, sparse) {
