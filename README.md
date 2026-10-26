@@ -10,8 +10,8 @@ The site behind **[joshuashew.com](https://joshuashew.com)** (and its mirror at
 | [`/`](https://joshuashew.com/) | Site index |
 | [`/artifacts/`](https://joshuashew.com/artifacts/) | Index of pages written by Claude |
 | [`/artifacts/allston/`](https://joshuashew.com/artifacts/allston/) | The Allston Strata — a layered history of Allston, Massachusetts |
+| [`/artifacts/transcript/`](https://joshuashew.com/artifacts/transcript/) | MacAskill / 80,000 Hours — synchronized transcript viewer (moved from `/transcript/`, which 301s here via `_redirects`) |
 | [`/tools/`](https://joshuashew.com/tools/) | Index of interactive pages and viewers |
-| [`/transcript/`](https://joshuashew.com/transcript/) | MacAskill / 80,000 Hours — synchronized transcript viewer |
 | [`/margin/`](https://joshuashew.com/margin/) | Margin annotations on a web page, read live from the author's AT Protocol repo |
 
 ## Infrastructure
@@ -29,7 +29,7 @@ the shared `/site-bar.css`:
 
 ```html
 <link rel="stylesheet" href="/site-bar.css">   <!-- in <head> -->
-<header class="site-bar" style="--sb-max:720px;--sb-pad:1.4rem"><nav aria-label="Site"><a class="sb-home" href="/">joshuashew.com</a><a href="/artifacts/">Artifacts</a><a href="/tools/">Tools</a></nav></header>
+<header class="site-bar" style="--sb-max:720px;--sb-pad:1.4rem"><nav aria-label="Site"><a class="sb-home" href="/">joshuashew.com</a><a href="/tools/">Tools</a><a href="/artifacts/">Artifacts</a></nav></header>
 ```
 
 - The bar links to **sections**, not pages, so adding a page never touches the bar on
@@ -60,20 +60,22 @@ Pages written by Claude go under `/artifacts/` so the provenance is legible from
 jshoes-tools/
 ├── index.html              # site root
 ├── site-bar.css            # shared navigation bar (see Navigation)
+├── avatar-penguin.jpg      # home-page avatar (Bluesky profile picture)
+├── _redirects              # old /transcript/ links → /artifacts/transcript/
 ├── 404.html
 ├── artifacts/
 │   ├── index.html          # index of Claude-written pages
 │   └── allston/
 │       ├── index.html      # The Allston Strata
 │       └── social-card.png
+│   └── transcript/
+│       └── index.html      # MacAskill transcript viewer
 ├── tools/
 │   └── index.html          # index of interactive pages
-├── transcript/
-│   └── index.html          # MacAskill transcript viewer
 ├── margin/
 │   └── index.html          # Margin annotations viewer (backed by functions/)
 ├── functions/              # Cloudflare Pages Functions for /margin/
-├── social-card.png         # OG image for the transcript page
+├── social-card.png         # OG image for the transcript page (kept at the root; the page links it by absolute URL)
 └── README.md
 ```
 
@@ -81,4 +83,4 @@ jshoes-tools/
 
 Pages under `/artifacts/` are written by Claude and are labelled on the page itself
 with the model that produced them, alongside the verbatim prompt. `/artifacts/allston/`
-was researched and written by Claude Opus 5. `/transcript/` was built by Claude Sonnet 4.6.
+was researched and written by Claude Opus 5. `/artifacts/transcript/` was built by Claude Sonnet 4.6.

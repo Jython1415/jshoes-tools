@@ -12,90 +12,92 @@
 <meta property="og:url" content="https://joshuashew.com/tools/">
 <meta property="og:title" content="Tools — joshuashew.com">
 <meta property="og:description" content="Interactive pages and viewers published at joshuashew.com.">
-<meta property="og:image" content="https://joshuashew.com/social-card-home.png">
+<meta property="og:image" content="https://joshuashew.com/tools/social-card.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Joshua Shew — a place to put things that should have a stable URL.">
+<meta property="og:image:alt" content="Tools — joshuashew.com">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Tools — joshuashew.com">
 <meta name="twitter:description" content="Interactive pages and viewers published at joshuashew.com.">
-<meta name="twitter:image" content="https://joshuashew.com/social-card-home.png">
+<meta name="twitter:image" content="https://joshuashew.com/tools/social-card.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="/site-bar.css">
 <style>
 :root{
-  --paper:#E7EAE5; --surface:#F2F4F0; --ink:#161D1F; --ink-2:#4F5B58; --ink-3:#77827E;
+  --paper:#E7EAE5; --surface:#F2F4F0; --ink:#161D1F; --ink-2:#4F5B58; --ink-3:#5F6A66;
   --rule:#C4CCC2; --rule-soft:#D5DBD2; --brick:#B4553E; --stone:#4F7189; --marsh:#557044;
-  --wash:#F0DFD9;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --paper:#12171A; --surface:#1A2024; --ink:#E2E7E3; --ink-2:#A3AFAB; --ink-3:#7C8783;
+    --paper:#12171A; --surface:#1A2024; --ink:#E2E7E3; --ink-2:#A3AFAB; --ink-3:#97A29E;
     --rule:#333C40; --rule-soft:#283034; --brick:#DB7A61; --stone:#7FA6C0; --marsh:#84A870;
-    --wash:#33211C;
   }
 }
 :root[data-theme="dark"]{
-  --paper:#12171A; --surface:#1A2024; --ink:#E2E7E3; --ink-2:#A3AFAB; --ink-3:#7C8783;
+  --paper:#12171A; --surface:#1A2024; --ink:#E2E7E3; --ink-2:#A3AFAB; --ink-3:#97A29E;
   --rule:#333C40; --rule-soft:#283034; --brick:#DB7A61; --stone:#7FA6C0; --marsh:#84A870;
-  --wash:#33211C;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{
   margin:0;background:var(--paper);color:var(--ink);
-  font-family:"Source Serif 4",Georgia,serif;font-size:17px;line-height:1.6;
+  font-family:"Source Serif 4",Georgia,serif;font-size:17px;line-height:1.5;
   -webkit-font-smoothing:antialiased;
 }
-.wrap{max-width:720px;margin:0 auto;padding:clamp(2.4rem,7vw,4.5rem) 1.4rem 4rem}
+.wrap{max-width:720px;margin:0 auto;padding:clamp(1.8rem,5vw,3rem) 1.4rem 3rem}
+.me{display:flex;align-items:center;gap:1rem}
+.pics{display:flex;flex:none}
+.pics img{width:60px;height:60px;border-radius:50%;display:block;border:2px solid var(--paper);background:var(--surface)}
+.pics img+img{margin-left:-14px}
+.pics .peng{image-rendering:pixelated}
 h1{
   font-family:"Zilla Slab",Rockwell,Georgia,serif;font-weight:700;
-  font-size:clamp(2rem,6vw,2.8rem);line-height:1.05;letter-spacing:-.02em;margin:0;
+  font-size:clamp(1.9rem,6vw,2.5rem);line-height:1;letter-spacing:-.02em;margin:0;
 }
-.tag{color:var(--ink-2);margin:1rem 0 0;max-width:56ch}
-.note{
-  margin-top:1.6rem;background:var(--wash);border:1px solid var(--brick);
-  border-radius:3px;padding:1rem 1.2rem;max-width:60ch;font-size:.94rem;
+.handle{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.78rem;
+  color:var(--ink-3);text-decoration:none;display:inline-block;margin-top:.4rem;
 }
-.note p{margin:0}
-ul{list-style:none;margin:2.4rem 0 0;padding:0;display:flex;flex-direction:column;gap:.9rem}
-li a{
-  display:block;background:var(--surface);border:1px solid var(--rule-soft);
-  border-left:4px solid var(--brick);border-radius:3px;
-  padding:1.1rem 1.3rem;text-decoration:none;color:inherit;
+.handle:hover,.handle:focus-visible{color:var(--brick)}
+.rule{height:3px;display:flex;margin:1.4rem 0 0;border-radius:2px;overflow:hidden}
+.rule i{flex:1}
+h2{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);
+  font-weight:500;margin:2rem 0 .3rem;
 }
-li a:hover,li a:focus-visible{border-left-color:var(--stone);outline:none}
-li a:focus-visible{box-shadow:0 0 0 2px var(--stone)}
-li .t{font-family:"Zilla Slab",Georgia,serif;font-weight:600;font-size:1.12rem;display:block;line-height:1.3}
-li .d{color:var(--ink-2);font-size:.93rem;display:block;margin-top:.3rem}
-li .m{
-  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.7rem;
-  color:var(--ink-3);display:block;margin-top:.55rem;letter-spacing:.02em;
+h2 a{color:inherit;text-decoration:none}
+h2 a:hover,h2 a:focus-visible{color:var(--brick)}
+.rows{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.rows li{border-bottom:1px solid var(--rule-soft)}
+.rows a{
+  display:grid;grid-template-columns:minmax(0,13rem) minmax(0,1fr);gap:.2rem 1.2rem;
+  padding:.6rem .2rem;text-decoration:none;color:inherit;align-items:baseline;
 }
-footer{
-  margin-top:3.4rem;padding-top:1.4rem;border-top:1px solid var(--rule);
-  color:var(--ink-3);font-size:.85rem;max-width:62ch;
-}
+.rows .t{font-family:"Zilla Slab",Georgia,serif;font-weight:600;font-size:1.02rem;line-height:1.3}
+.rows .d{color:var(--ink-2);font-size:.9rem;line-height:1.45}
+.rows a:hover .t,.rows a:focus-visible .t{color:var(--brick)}
+.rows a:focus-visible{outline:2px solid var(--stone);outline-offset:-2px;border-radius:2px}
+@media (max-width:560px){.rows a{grid-template-columns:minmax(0,1fr)}}
+</style>
+<style>
+.wrap h1{font-size:clamp(1.8rem,5vw,2.3rem)}
+.tag{color:var(--ink-2);margin:.6rem 0 1.4rem;max-width:56ch}
+.rows .m{grid-column:2;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.7rem;color:var(--ink-3);letter-spacing:.02em}
+@media (max-width:560px){.rows .m{grid-column:1}}
 </style>
 </head>
 <body>
-<header class="site-bar" style="--sb-max:720px;--sb-pad:1.4rem"><nav aria-label="Site"><a class="sb-home" href="/">joshuashew.com</a><a href="/artifacts/">Artifacts</a><a href="/tools/" aria-current="page">Tools</a></nav></header>
+<header class="site-bar" style="--sb-max:720px;--sb-pad:1.4rem"><nav aria-label="Site"><a class="sb-home" href="/">joshuashew.com</a><a href="/tools/" aria-current="page">Tools</a><a href="/artifacts/">Artifacts</a></nav></header>
 <div class="wrap">
   <h1>Tools</h1>
   <p class="tag">Interactive pages and viewers.</p>
-
-  <ul>
-    <li><a href="/transcript/">
-      <span class="t">MacAskill · 80,000 Hours transcript</span>
-      <span class="d">Three-section synchronized transcript viewer with speaker attribution.</span>
-      <span class="m">/transcript/</span>
-    </a></li>
+  <ul class="rows">
     <li><a href="/margin/">
       <span class="t">Margin notes</span>
       <span class="d">One person&rsquo;s Margin annotations and highlights on a web page, read live from their AT Protocol repository.</span>
-      <span class="m">/margin/</span>
     </a></li>
   </ul>
 </div>
