@@ -3,7 +3,7 @@
   "client_name": "joshuashew.com games",
   "client_uri": "https://joshuashew.com/games/",
   "redirect_uris": [
-    "https://joshuashew.com/games/neon-grade/"
+    "https://joshuashew.com/games/slope-3-remake/"
   ],
   "scope": "atproto repo:com.joshuashew.games.score?action=create",
   "grant_types": [

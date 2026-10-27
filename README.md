@@ -14,7 +14,7 @@ The site behind **[joshuashew.com](https://joshuashew.com)** (and its mirror at
 | [`/tools/`](https://joshuashew.com/tools/) | Index of interactive pages and viewers |
 | [`/margin/`](https://joshuashew.com/margin/) | Margin annotations on a web page, read live from the author's AT Protocol repo |
 | [`/games/`](https://joshuashew.com/games/) | Index of browser games |
-| [`/games/neon-grade/`](https://joshuashew.com/games/neon-grade/) | Neon Grade — endless downhill ball game in the style of Slope 3; scores post to Bluesky as `com.joshuashew.games.score` records |
+| [`/games/slope-3-remake/`](https://joshuashew.com/games/slope-3-remake/) | Slope 3 Remake — a remake of the browser game Slope 3, rebuilt from its measured block shapes, spacing and physics; scores post to Bluesky as `com.joshuashew.games.score` records |
 | `/games/client-metadata.json` | Not a page: the AT Protocol OAuth client metadata for Bluesky sign-in in the games. Its `client_id` is its own URL; add each game's page to `redirect_uris` |
 
 ## Infrastructure
@@ -81,10 +81,14 @@ jshoes-tools/
 ├── games/
 │   ├── index.html          # index of games
 │   ├── client-metadata.json  # Bluesky (AT Protocol) OAuth client for the games
-│   └── neon-grade/
+│   └── slope-3-remake/
 │       ├── index.html      # page, menu, leaderboard and results screens
-│       ├── sim.js          # deterministic physics and track generator (no rendering)
-│       ├── game.js         # Three.js renderer, audio, input, game flow
+│       ├── blocks.js       # block shapes, triggers and spacing measured from the original
+│       ├── phys.js         # collision primitives (sphere vs box and triangle)
+│       ├── ball.js         # rigid-body ball: forces, drag, friction, spin cap, triggers
+│       ├── world.js        # places blocks section by section, as the original's loader does
+│       ├── cfg.js          # ball settings from the original
+│       ├── game.js         # Three.js renderer, camera, audio, input, game flow
 │       ├── atp.js          # Bluesky sign-in, posting scores, reading the leaderboard
 │       └── social-card.png
 ├── functions/              # Cloudflare Pages Functions for /margin/
@@ -97,4 +101,4 @@ jshoes-tools/
 Pages under `/artifacts/` are written by Claude and are labelled on the page itself
 with the model that produced them, alongside the verbatim prompt. `/artifacts/allston/`
 was researched and written by Claude Opus 5. `/artifacts/transcript/` was built by Claude Sonnet 4.6.
-`/games/neon-grade/` was built by Claude.
+`/games/slope-3-remake/` was built by Claude.
