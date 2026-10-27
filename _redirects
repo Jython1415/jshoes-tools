@@ -4,4 +4,4 @@
 /transcript/* /artifacts/transcript/:splat 301
 
 # Approvals card links: one static fallback page reads <kind>/<id> from its own URL (a/index.html).
-/a/* /a/index.html 200
+/a/:kind/:id /a/ 200
