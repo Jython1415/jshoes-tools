@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Approval card</title>
+<style>
+  :root { color-scheme: light dark; --fg: #1c1c1e; --bg: #ffffff; --mut: #6b6b70; --line: #d8d8dc; --acc: #2f5fd0; }
+  @media (prefers-color-scheme: dark) { :root { --fg: #ececf0; --bg: #141416; --mut: #a0a0a8; --line: #3a3a40; --acc: #8aa8ff; } }
+  body { font: 17px/1.5 -apple-system, system-ui, sans-serif; max-width: 30rem; margin: 2rem auto; padding: 0 16px;
+         color: var(--fg); background: var(--bg); }
+  h1 { font-size: 1.25rem; margin: 0 0 .25rem; }
+  .mut { color: var(--mut); font-size: .9rem; overflow-wrap: anywhere; }
+  .btn { display: block; text-align: center; padding: .8rem 1rem; margin: .75rem 0; border-radius: 10px;
+         border: 1px solid var(--line); color: var(--fg); text-decoration: none; font-weight: 600; }
+  .btn.primary { background: var(--acc); border-color: var(--acc); color: #fff; }
+  label { display: flex; gap: .5rem; align-items: center; font-size: .9rem; color: var(--mut); }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<!--
+  Public fallback for a link to one Approvals card: https://joshuashew.com/a/<kind>/<id>.
+  The Approvals iPhone app claims /a/*/* through /.well-known/apple-app-site-association, so on an iPhone
+  with the app this page normally never loads. It loads when no app takes the link (a browser on the Mac,
+  an in-app browser, no app installed). It fetches nothing and shows nothing but the kind and id in its
+  own URL. The card itself lives on the tailnet-only inbox; the app hand-off is the custom scheme
+  com.joshuashew.approvals://item/<kind>/<id>. Docs: claude-workspace modules/tailnet-pages
+  ("Linking to one card").
+-->
+<main id="choose" hidden>
+  <h1>Approval card</h1>
+  <p class="mut" id="what"></p>
+  <a class="btn primary" id="app" href="#">Open in the Approvals app</a>
+  <a class="btn" id="web" href="#">Open in the browser</a>
+  <label><input type="checkbox" id="remember"> Always open in the app on this device</label>
+  <p class="mut" id="tried" hidden>If the app did not open, use the browser.</p>
+</main>
+<main id="bad" hidden>
+  <h1>Approval card</h1>
+  <p class="mut">This link does not name a card.</p>
+  <a class="btn" href="https://approvals.tau.internal.joshuashew.com/approvals">Open the Approvals inbox</a>
+</main>
+<script>
+(function () {
+  "use strict";
+  var INBOX = "https://approvals.tau.internal.joshuashew.com";
+  var SCHEME = "com.joshuashew.approvals://item/";
+  // Only "app" is ever remembered: this page shows up exactly when the app did not take the link, so a
+  // remembered "browser" would redirect with no way back. #choose forgets the choice.
+  var KEY = "approvals-open-in";
+  var KIND_RE = /^[a-z][a-z0-9_-]{0,31}$/;              // tailnet-home config.py kind rule
+  var ID_RE = /^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$/;   // tailnet-home inbox.ID_RE
+
+  function store(v) { try { if (v === "app") localStorage.setItem(KEY, "app"); else localStorage.removeItem(KEY); } catch (e) {} }
+  function stored() { try { return localStorage.getItem(KEY) === "app" ? "app" : ""; } catch (e) { return ""; } }
+
+  var parts = location.pathname.replace(/^\/a\/?/, "").split("/");
+  var kind = "", id = "";
+  try { kind = decodeURIComponent(parts[0] || ""); id = decodeURIComponent(parts[1] || ""); } catch (e) {}
+  if (location.hash === "#choose") { store(""); }
+  if (!(parts.length === 2 && KIND_RE.test(kind) && ID_RE.test(id))) {
+    document.getElementById("bad").hidden = false;
+    return;
+  }
+  // ?item= opens that card: in the list's detail pane (tailnet-home 0.27.0+) or, before that, its own /item/ page.
+  var web = INBOX + "/approvals?item=" + encodeURIComponent(kind + ":" + id);
+  var app = SCHEME + kind + "/" + encodeURIComponent(id);
+
+  var ua = navigator.userAgent || "";
+  var ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  var mac = !ios && /Macintosh/.test(ua);
+  if (!ios && !mac) { location.replace(web); return; }   // no Approvals app exists elsewhere
+
+  var choice = location.hash === "#choose" ? "" : stored();
+
+  document.getElementById("what").textContent = kind + " · " + id;
+  var aApp = document.getElementById("app"), aWeb = document.getElementById("web");
+  aApp.href = app; aWeb.href = web;
+  var remember = document.getElementById("remember");
+  aApp.addEventListener("click", function () { if (remember.checked) store("app"); document.getElementById("tried").hidden = false; });
+  document.getElementById("choose").hidden = false;
+  if (choice === "app") { document.getElementById("tried").hidden = false; location.href = app; }
+})();
+</script>
+</body>
+</html>
