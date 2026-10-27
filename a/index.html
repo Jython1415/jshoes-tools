@@ -35,7 +35,7 @@
   <p class="mut" id="what"></p>
   <a class="btn primary" id="app" href="#">Open in the Approvals app</a>
   <a class="btn" id="web" href="#">Open in the browser</a>
-  <label><input type="checkbox" id="remember" checked> Remember on this device</label>
+  <label><input type="checkbox" id="remember"> Always open in the app on this device</label>
   <p class="mut" id="tried" hidden>If the app did not open, use the browser.</p>
 </main>
 <main id="bad" hidden>
@@ -48,17 +48,14 @@
   "use strict";
   var INBOX = "https://approvals.tau.internal.joshuashew.com";
   var SCHEME = "com.joshuashew.approvals://item/";
-  // Bump when a platform's app gains the hand-off (e.g. the Mac app), so a remembered "browser" is asked again once.
-  var EPOCH = "1";
+  // Only "app" is ever remembered: this page shows up exactly when the app did not take the link, so a
+  // remembered "browser" would redirect with no way back. #choose forgets the choice.
   var KEY = "approvals-open-in";
-  var KIND_RE = /^[a-z]{1,32}$/;
+  var KIND_RE = /^[a-z][a-z0-9_-]{0,31}$/;              // tailnet-home config.py kind rule
   var ID_RE = /^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$/;   // tailnet-home inbox.ID_RE
 
-  function store(v) { try { if (v) localStorage.setItem(KEY, EPOCH + ":" + v); else localStorage.removeItem(KEY); } catch (e) {} }
-  function stored() {
-    try { var s = localStorage.getItem(KEY) || ""; var p = s.split(":"); return p[0] === EPOCH ? p[1] : ""; }
-    catch (e) { return ""; }
-  }
+  function store(v) { try { if (v === "app") localStorage.setItem(KEY, "app"); else localStorage.removeItem(KEY); } catch (e) {} }
+  function stored() { try { return localStorage.getItem(KEY) === "app" ? "app" : ""; } catch (e) { return ""; } }
 
   var parts = location.pathname.replace(/^\/a\/?/, "").split("/");
   var kind = "", id = "";
@@ -78,14 +75,12 @@
   if (!ios && !mac) { location.replace(web); return; }   // no Approvals app exists elsewhere
 
   var choice = location.hash === "#choose" ? "" : stored();
-  if (choice === "web") { location.replace(web); return; }
 
   document.getElementById("what").textContent = kind + " · " + id;
   var aApp = document.getElementById("app"), aWeb = document.getElementById("web");
   aApp.href = app; aWeb.href = web;
   var remember = document.getElementById("remember");
   aApp.addEventListener("click", function () { if (remember.checked) store("app"); document.getElementById("tried").hidden = false; });
-  aWeb.addEventListener("click", function () { if (remember.checked) store("web"); });
   document.getElementById("choose").hidden = false;
   if (choice === "app") { document.getElementById("tried").hidden = false; location.href = app; }
 })();
