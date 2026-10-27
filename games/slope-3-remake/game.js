@@ -37,8 +37,8 @@
   renderer.setPixelRatio(pr);
   var quality = softGL ? 1 : 0;   // 0 full, 1 plain texture filtering, 2 no city backdrop
   var scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x0b2433, 260, 900);
-  var camera = new THREE.PerspectiveCamera(60, 1, 0.3, 2000);
+  scene.fog = new THREE.Fog(0x0b2433, 900, 2600);   // the original has no fog; far enough to see what's coming
+  var camera = new THREE.PerspectiveCamera(60, 1, 0.3, 3000);
   function resize() {
     var w = window.innerWidth, h = window.innerHeight;
     renderer.setSize(w, h, false); camera.aspect = w / Math.max(1, h); camera.updateProjectionMatrix();
@@ -101,6 +101,7 @@
     if (ay >= az) return [p[0] / cell, p[2] / cell];
     return [p[0] / cell, p[1] / cell];
   }
+  var triExpected = 0, triDrawn = 0;   // every visible triangle of the original must be drawn (checked by the test suite)
   function Acc() { this.p = []; this.u = []; }
   Acc.prototype.tri = function (a, b, c, n, mat, o, uvs) {
     var pts = [a, b, c];
@@ -115,40 +116,68 @@
     g.setAttribute("position", new THREE.Float32BufferAttribute(acc.p, 3));
     g.setAttribute("uv", new THREE.Float32BufferAttribute(acc.u, 2));
     g.computeBoundingSphere();
-    var m = new THREE.Mesh(g, mat); m.material.side = THREE.DoubleSide;
+    var m = new THREE.Mesh(g, mat);   // front faces only, as the original draws them
     return m;
   }
 
   var world, ball, groups = [], builtBlocks = 0, movers = [], rnd = Math.random;
   var root = new THREE.Group(); scene.add(root);
-  function buildBlocks() {
-    while (builtBlocks < world.placed.length) {
-      var blk = world.placed[builtBlocks++], o = blk.origin, accs = {};
+  // Each block is drawn from the original's visible meshes and their transforms; collision meshes are
+  // only for physics. (The two differ in places, e.g. the start tunnel draws a longer arc than it collides with.)
+  var MESHES = S3BLOCKS.meshes, MATNAME = { GroundThin: "Ground", polygonDeathRed: "Peril" };
+  function placeMesh(r) {   // mesh-local -> block frame, cached per renderer
+    if (r._pts) return r._pts;
+    var m = MESHES[r.mesh];
+    r._pts = m.v.map(function (v) { return P.add(r.pos, P.qrot(r.rot, [v[0] * r.scale[0], v[1] * r.scale[1], v[2] * r.scale[2]])); });
+    return r._pts;
+  }
+  function addRenderer(r, accFor, off, col) {
+    var m = MESHES[r.mesh]; if (!m) return;
+    // Same mesh for drawing and collision: draw the collision copy, which carries the in-game pose (the
+    // original moves spawned obstacles at runtime; the visible-mesh record keeps the editor pose).
+    var pts = col && col.src.mesh === r.mesh && col.src.verts ? col.src.verts : placeMesh(r);
+    m.sub.forEach(function (s) { triExpected += s.tri.length; });
+    m.sub.forEach(function (s) {
+      var name = r.materials[s.slot] || r.materials[0]; name = MATNAME[name] || name;
+      if (!MATS[name]) name = "Ground";
+      var acc = accFor(name);
+      // reversed order: Unity's front faces are clockwise, three's counter-clockwise, and the z flip alone shows Unity's back faces
+      s.tri.forEach(function (t) { acc.tri(pts[t[0]], pts[t[2]], pts[t[1]], null, name, off, [m.uv[t[0]], m.uv[t[2]], m.uv[t[1]]]); triDrawn++; });
+    });
+  }
+  // Blocks are merged four at a time into one group (one mesh per material), so the track ahead costs a
+  // handful of draw calls instead of several per block.
+  var CHUNK = 4;
+  function buildBlocks(limit) {
+    var made = 0;
+    while (builtBlocks < world.placed.length && made++ < (limit || 1e9)) {
+      var first = world.placed[builtBlocks], o = first.origin, accs = {};
       var grp = new THREE.Group(); grp.userData.along = W.along(o);
-      blk.cols.forEach(function (col) {
-        if (col.mat === "invisible") return;
-        var mat = MATS[col.mat] ? col.mat : (col.death ? "Peril" : "Ground");
-        if (col.mover) {   // moving obstacles get their own mesh so they can slide
-          var acc1 = new Acc(), z = [0, 0, 0];
-          col.src.tris.forEach(function (t) { acc1.tri(t.a, t.b, t.c, t.n, mat, z, t.uv); });
-          var m = meshOf(acc1, MATS[mat]); m.userData.col = col;
-          grp.add(m); movers.push(m);
-          return;
-        }
-        var off = P.sub(col.origin, o), acc = accs[mat] || (accs[mat] = new Acc());
-        col.src.tris.forEach(function (t) { acc.tri(t.a, t.b, t.c, t.n, mat, off, t.uv); });
-      });
-      for (var k in accs) grp.add(meshOf(accs[k], MATS[k]));
-      // wireframe-city towers beside the canyon, like the original's backdrop
-      var city = new Acc(), span = Math.max(40, (blk.spec.name === "5 Obstacle" ? 230 : 120));
-      for (var s = 0; s < span; s += 22 + rnd() * 18) {
-        for (var side = -1; side <= 1; side += 2) {
-          var x0 = 5 + side * (38 + rnd() * 40), w = 10 + rnd() * 18, top = 10 + rnd() * 45, d = 18 + rnd() * 20;
-          var z0 = s * SQ2, y0 = -s * SQ2 + top;
-          box(city, [Math.min(x0, x0 + side * w), y0 - 160, z0], [Math.max(x0, x0 + side * w), y0, z0 + d]);
+      var end = Math.min(world.placed.length, builtBlocks + CHUNK);
+      for (; builtBlocks < end; builtBlocks++) {
+        var blk = world.placed[builtBlocks], bo = P.sub(blk.origin, o);
+        blk.spec.render.forEach(function (r) {
+          var col = blk.colByName[r.object];
+          if (col && col.mover) {   // moving obstacles get their own mesh so they can slide
+            var own = {};
+            addRenderer(r, function (n) { return own[n] || (own[n] = new Acc()); }, [0, 0, 0], col);
+            for (var n in own) { var mm = meshOf(own[n], MATS[n]); mm.userData.col = col; grp.add(mm); movers.push(mm); }
+            return;
+          }
+          var off = col ? P.sub(col.origin, o) : bo;   // follows the collider's random sideways placement
+          addRenderer(r, function (n) { return accs[n] || (accs[n] = new Acc()); }, off, col);
+        });
+        // wireframe-city towers beside the canyon, like the original's backdrop
+        var span = Math.max(40, (blk.spec.name === "5 Obstacle" ? 230 : 120)), city = accs.City || (accs.City = new Acc());
+        for (var s = 0; s < span; s += 22 + rnd() * 18) {
+          for (var side = -1; side <= 1; side += 2) {
+            var x0 = 5 + side * (38 + rnd() * 40), w = 10 + rnd() * 18, top = 10 + rnd() * 45, d = 18 + rnd() * 20;
+            var z0 = s * SQ2 + bo[2], y0 = -s * SQ2 + top + bo[1];
+            box(city, [Math.min(x0, x0 + side * w) + bo[0], y0 - 160, z0], [Math.max(x0, x0 + side * w) + bo[0], y0, z0 + d]);
+          }
         }
       }
-      if (city.p.length) { var cm = meshOf(city, MATS.City); cm.userData.city = true; grp.add(cm); }
+      for (var k in accs) if (accs[k].p.length) grp.add(meshOf(accs[k], MATS[k]));
       grp.position.set(o[0], o[1], -o[2]);
       root.add(grp); groups.push(grp);
     }
@@ -173,24 +202,19 @@
 
   // ---- ball, trail, shatter, stars ---------------------------------------------------------------
   var ballGroup = new THREE.Group(), spin = new THREE.Group();
-  // the original ball: a glowing white wire globe over a dim translucent body
-  spin.add(new THREE.Mesh(new THREE.SphereGeometry(0.5, 24, 16), new THREE.MeshBasicMaterial({ color: 0x2a5866, transparent: true, opacity: 0.55, depthWrite: false })));
-  var circ = [];
-  [[1, 0, 0], [0, 1, 0], [0, 0, 1]].forEach(function (axis, c) {
-    for (var i = 0; i < 48; i++) {
-      var a0 = i / 48 * Math.PI * 2, a1 = (i + 1) / 48 * Math.PI * 2, r = 0.505;
-      var p0 = [Math.cos(a0) * r, Math.sin(a0) * r, 0], p1 = [Math.cos(a1) * r, Math.sin(a1) * r, 0];
-      var rot = function (p) { return c === 0 ? p : c === 1 ? [p[2], p[1], p[0]] : [p[0], p[2], p[1]]; };
-      circ.push.apply(circ, rot(p0).concat(rot(p1)));
-    }
-  });
-  var lg = new THREE.BufferGeometry(); lg.setAttribute("position", new THREE.Float32BufferAttribute(circ, 3));
-  // thick rings (browsers draw lines one pixel wide): an equator and two meridians, like the original's globe
-  var ringMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-  [[0, 0, 0], [Math.PI / 2, 0, 0], [0, Math.PI / 2, 0]].forEach(function (r) {
-    var ring = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.028, 6, 40), ringMat); ring.rotation.set(r[0], r[1], r[2]); spin.add(ring);
-  });
-  var halo = new THREE.Mesh(new THREE.SphereGeometry(0.62, 20, 14), new THREE.MeshBasicMaterial({ color: 0x4acbe1, transparent: true, opacity: 0.16, blending: THREE.AdditiveBlending, depthWrite: false }));
+  // The original ball: Unity's sphere wrapped with the same grid tile as the track, repeated 6 x 6
+  // (six meridians, six bands, a small ring at each pole), glowing white-cyan over a dark glossy body.
+  var texBall = canvasTex(64, function (g, n) {
+    var bw = n * 1.2 / 32;
+    g.fillStyle = "#082128"; g.fillRect(0, 0, n, n);
+    g.fillStyle = "#58d6ec"; g.globalAlpha = 0.35;
+    g.fillRect(0, 0, n, bw * 2); g.fillRect(0, n - bw * 2, n, bw * 2); g.fillRect(0, 0, bw * 2, n); g.fillRect(n - bw * 2, 0, bw * 2, n);
+    g.globalAlpha = 1; g.fillStyle = "#e8fdff";
+    g.fillRect(0, 0, n, bw); g.fillRect(0, n - bw, n, bw); g.fillRect(0, 0, bw, n); g.fillRect(n - bw, 0, bw, n);
+  }, true);
+  texBall.repeat.set(6, 6);
+  spin.add(new THREE.Mesh(new THREE.SphereGeometry(0.5, 36, 24), new THREE.MeshBasicMaterial({ map: texBall })));
+  var halo = new THREE.Mesh(new THREE.SphereGeometry(0.6, 24, 16), new THREE.MeshBasicMaterial({ color: 0x4acbe1, transparent: true, opacity: 0.13, blending: THREE.AdditiveBlending, depthWrite: false }));
   ballGroup.add(halo);
   ballGroup.add(spin); scene.add(ballGroup);
 
@@ -406,6 +430,7 @@
     runSeed = (Math.random() * 4294967296) >>> 0;
     world = new W.World(runSeed);
     ball = new B.Ball(CFG);
+    world.ensureAhead(ball);
     buildBlocks();
     acc = 0; shards.visible = false; ballGroup.visible = true; seenSpeedUps = 0;
     cam.reset(); pushTrail(true);
@@ -510,8 +535,29 @@
     ALL_TEX.forEach(function (t) { t.anisotropy = q >= 1 ? 1 : ANISO; t.needsUpdate = true; });
     MATS.City.visible = q < 2;
   }
+  var noAdapt = false;
+  // Depth pre-pass: draw the solid track once with colour off (cheap), then shade only the nearest surface
+  // at each pixel. The picture is identical; overlapping layers (deck columns, towers, city) stop costing
+  // full shading for every hidden layer.
+  var prepass = false, depthOnly = new THREE.MeshBasicMaterial({ colorWrite: false, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
+  var hidden = [];
+  function renderPrepass() {
+    renderer.autoClear = false;
+    renderer.clear();
+    // pass 1: depth of opaque geometry only (sky, stars, ball halo, trail and shards are left out)
+    var bg = scene.background; scene.background = null;
+    hidden.length = 0;
+    [stars, trail, ballGroup, shards].forEach(function (o) { if (o.visible) { o.visible = false; hidden.push(o); } });
+    scene.overrideMaterial = depthOnly;
+    renderer.render(scene, camera);
+    scene.overrideMaterial = null; scene.background = bg;
+    hidden.forEach(function (o) { o.visible = true; });
+    // pass 2: the real picture; hidden layers now fail the depth test before any shading
+    renderer.render(scene, camera);
+    renderer.autoClear = true;
+  }
   function adaptQuality(dt) {
-    if (state !== "play") return;
+    if (state !== "play" || noAdapt) return;
     frames++; frameAcc += dt;
     if (frameAcc < 0.75) return;
     var avg = frameAcc / frames; frames = 0; frameAcc = 0;
@@ -522,8 +568,10 @@
     if (fast >= 4 && pr < maxPR) next = Math.min(maxPR, pr * 1.12);
     if (next !== pr) { pr = next; renderer.setPixelRatio(pr); resize(); slow = fast = 0; }
   }
+  var jsMs = 0;
   function frame(now) {
     requestAnimationFrame(frame);
+    var tStart = performance.now();
     var dt = Math.min(0.05, Math.max(0, (now - last) / 1000)); last = now;
     if (state === "play") {
       acc += dt;
@@ -542,7 +590,8 @@
         if (ball.cause !== "fall") { shatter(ball.p[0], ball.p[1], ball.p[2], ball.v); ballGroup.visible = false; }
         gameOver();
       }
-      buildBlocks();
+      world.ensureAhead(ball);
+      buildBlocks(1);   // one group of blocks per frame, so a big section doesn't stutter
     } else if (state === "over" && ball.cause === "fall") {
       ball.v[1] -= 9.81 * dt; ball.p = P.add(ball.p, P.mul(ball.v, dt));   // keep falling into the void
     }
@@ -562,7 +611,9 @@
     updateShards(dt);
     if (state !== "pause") cam.place(dt);
     cullBehind(W.along(ball.dead ? [0, camera.position.y, -camera.position.z] : ball.p));
-    renderer.render(scene, camera);
+    var tRender = performance.now();
+    if (prepass) renderPrepass(); else renderer.render(scene, camera);
+    jsMs = jsMs * 0.95 + (tRender - tStart) * 0.05;
     adaptQuality(dt);
   }
 
@@ -661,8 +712,10 @@
   window.__ng = {
     get state() { return state; }, get ball() { return ball; }, get world() { return world; },
     get along() { return W.along(ball.p); }, get x() { return ball.p[0]; },
-    get pixelRatio() { return pr; }, get drawCalls() { return renderer.info.render.calls; },
+    get pixelRatio() { return pr; }, get jsMs() { return jsMs; }, get triCounts() { return [triExpected, triDrawn]; }, get drawCalls() { return renderer.info.render.calls; },
     get geometries() { return renderer.info.memory.geometries; }, get quality() { return quality; }, gpu: gpuName,
-    start: startRun, keys: keys, accept: accept, mats: MATS, renderer: renderer
+    start: startRun, keys: keys, accept: accept, mats: MATS, renderer: renderer, scene: scene,
+    setPrepass: function (on) { prepass = on; },
+    freezeQuality: function (q, ratio) { noAdapt = true; setQuality(q); pr = ratio; renderer.setPixelRatio(ratio); resize(); }
   };
 })();

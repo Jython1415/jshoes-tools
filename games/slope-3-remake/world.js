@@ -4,7 +4,7 @@
 var S3W = (function (P, DATA) {
   "use strict";
   var add = P.add, sub = P.sub, mul = P.mul, cross = P.cross, len = P.len;
-  var BUCKET = 10, SQ2 = Math.SQRT1_2;
+  var BUCKET = 10, SQ2 = Math.SQRT1_2, ZERO = [0, 0, 0];
   function along(p) { return (p[2] - p[1]) * SQ2; }   // distance down the 45-degree slope
   function mulberry32(a) {
     return function () {
@@ -37,12 +37,12 @@ var S3W = (function (P, DATA) {
         c.vertices.forEach(function (v) { for (var i = 0; i < 3; i++) { lo[i] = Math.min(lo[i], v[i]); hi[i] = Math.max(hi[i], v[i]); } });
         var mat = mats[c.name] || (/CollidePlane/.test(c.name) ? "invisible" : (c.tag === "Death" ? "Peril" : "Ground"));
         if (/CollidePlane/.test(c.name)) mat = "invisible";
-        return { name: c.name, death: c.tag === "Death", tris: tris, lo: lo, hi: hi, mat: mat, mover: movers[c.name] || null, randomX: rx[c.name] || null };
+        return { name: c.name, mesh: c.mesh, verts: c.vertices, death: c.tag === "Death", tris: tris, lo: lo, hi: hi, mat: mat, mover: movers[c.name] || null, randomX: rx[c.name] || null };
       });
       var trig = b.triggers.filter(function (t) { return t.enabled !== false && t.kind !== "other"; }).map(function (t) {
         return { kind: t.kind, c: t.center, h: mul(t.size, 0.5), A: P.qmat(t.rot) };
       });
-      var spec = { name: b.name, tier: b.tier, weight: b.weight, cols: cols, trig: trig,
+      var spec = { name: b.name, tier: b.tier, weight: b.weight, cols: cols, trig: trig, render: b.render || [],
         startTranslate: b.startTranslate, translates: b.translates, translateFirstBlock: b.translateFirstBlock };
       BLOCKS[b.name] = spec;
       if (b.spawnable !== false && GROUPS[b.tier]) GROUPS[b.tier].push(spec);
@@ -72,7 +72,7 @@ var S3W = (function (P, DATA) {
   // Put one block at the marker (rotation identity, as in the original), then advance the marker.
   W.place = function (spec, t0, isStart) {
     var o = this.marker.p.slice(), self = this, bi = this.placed.length;
-    var blk = { spec: spec, origin: o, index: bi, cols: [], t0: t0 };
+    var blk = { spec: spec, origin: o, index: bi, cols: [], colByName: {}, t0: t0 };
     spec.cols.forEach(function (c, ci) {
       // The original sets a random local x on enable (geometry here is recorded at x = 0), and movers
       // bounce their local x (sliders) or y (risers, recorded at their start height) between min and max.
@@ -89,7 +89,7 @@ var S3W = (function (P, DATA) {
       if (mv) {   // bucket over the whole range it sweeps
         col.lo[mv.axis] += mv.min - mv.ref; col.hi[mv.axis] += mv.max - mv.ref;
       }
-      blk.cols.push(col); self.cols.push(col); self.bucketAdd(col, col.lo, col.hi);
+      blk.cols.push(col); blk.colByName[c.name] = col; self.cols.push(col); self.bucketAdd(col, col.lo, col.hi);
     });
     spec.trig.forEach(function (t, ti) {
       var tr = { id: "t" + bi + ":" + ti, kind: t.kind, c: add(t.c, o), h: t.h, A: t.A, blk: blk };
@@ -126,17 +126,22 @@ var S3W = (function (P, DATA) {
       this.place(s, t0, false);
     }
   };
-  // The original builds the next section when the ball enters a speed-up zone.
-  W.onSpeedUp = function (tg, ball) {
-    if (this.firedSections[tg.id]) return;
-    this.firedSections[tg.id] = true;
-    var r = this.repeats++, t0 = ball ? ball.t : 0;
+  // The original builds the next section only when the ball enters a speed-up zone, so the track ahead
+  // can pop in late. Here sections are built in the same order with the same contents, but early:
+  // whenever the built track ends less than AHEAD metres (down the slope) past the ball.
+  var AHEAD = 1500;
+  W.genSection = function (t0) {
+    var r = this.repeats++;
     if (r === 1) this.genBlocks(1, "easy", t0);
     else if (r === 2) { this.genBlocks(2, "easy", t0); this.genBlocks(2, "medium", t0); }
     else { var n = r === 3 ? 3 : 4; this.genBlocks(n, "easy", t0); this.genBlocks(n, "medium", t0); this.genBlocks(n, "hard", t0); }
     var sr = BLOCKS["Speed Run"]; this.translate(sr.startTranslate); this.place(sr, t0, false);
   };
-
+  W.ensureAhead = function (ball, ahead) {
+    var target = along(ball ? ball.p : [0, 0, 0]) + (ahead || AHEAD), guard = 0;
+    while (along(this.marker.p) < target && guard++ < 50) this.genSection(ball ? ball.t : 0);
+  };
+  W.onSpeedUp = function (tg, ball) { this.ensureAhead(ball); };
   // Mover displacement along its axis at time t: a constant-speed bounce between min and max.
   function moverOffset(m, t, t0) {
     var L = m.max - m.min; if (L <= 0) return { x: m.x0, v: 0 };
@@ -162,10 +167,17 @@ var S3W = (function (P, DATA) {
           var mo = moverOffset(col.mover, t, col.blk.t0);
           o = o.slice(); o[col.mover.axis] += mo.x - col.mover.ref; vel[col.mover.axis] = mo.v;
         }
-        var tris = col.src.tris;
-        for (var j = 0; j < tris.length; j++) {
+        // 0.97 is measured from the original's ball on its decks (Unity's averaging rule predicts 0.75,
+        // but the live game slows like 0.96-0.99)
+        var mu = col.mat === "invisible" ? 0.97 : 0.85, tris = col.src.tris, j;
+        if (!col.mover) {   // fixed pieces: world-space triangles built once, so a physics step allocates nothing here
+          if (!col.wtris) col.wtris = tris.map(function (tr) { return { id: col.id, kind: "tri", death: col.death, vel: ZERO, a: add(tr.a, o), b: add(tr.b, o), c: add(tr.c, o), n: tr.n, mu: mu }; });
+          for (j = 0; j < col.wtris.length; j++) out.push(col.wtris[j]);
+          continue;
+        }
+        for (j = 0; j < tris.length; j++) {
           var tr = tris[j];
-          out.push({ id: col.id, kind: "tri", death: col.death, vel: vel, a: add(tr.a, o), b: add(tr.b, o), c: add(tr.c, o), n: tr.n, mu: col.mat === "invisible" ? 0.97 : 0.85 });   // 0.97 measured from the original's ball on its decks (Unity's averaging rule predicts 0.75, but the live game slows like 0.96-0.99)
+          out.push({ id: col.id, kind: "tri", death: col.death, vel: vel, a: add(tr.a, o), b: add(tr.b, o), c: add(tr.c, o), n: tr.n, mu: mu });
         }
       }
     }
