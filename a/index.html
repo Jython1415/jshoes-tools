@@ -68,7 +68,8 @@
     document.getElementById("bad").hidden = false;
     return;
   }
-  var web = INBOX + "/item/" + kind + "/" + encodeURIComponent(id);
+  // ?item= opens that card: in the list's detail pane (tailnet-home 0.27.0+) or, before that, its own /item/ page.
+  var web = INBOX + "/approvals?item=" + encodeURIComponent(kind + ":" + id);
   var app = SCHEME + kind + "/" + encodeURIComponent(id);
 
   var ua = navigator.userAgent || "";
