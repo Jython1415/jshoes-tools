@@ -4,7 +4,7 @@ var S3CFG = (function (D) {
   return {
     dt: w.fixedDt, mass: w.ball.mass, radius: w.ball.radius, gravity: w.gravity,
     drag: w.ball.drag, angularDrag: w.ball.angularDrag,
-    friction: (w.ball.friction.dynamic + 0.6) / 2,   // ball (0.9) averaged with Unity's default 0.6 on the invisible planes it rolls on
+    friction: 0.97,   // fallback only; world.js sets friction per surface (0.97 on decks, measured from the original)
     frictionTrack: (w.ball.friction.dynamic + 0.8) / 2, // ball averaged with the visible track material (0.8)
     maxAngular: 7,                                    // Unity's default max angular speed (PhysicsManager)
     bounce: 0, startTurnForce: w.startTurnForce, firstLift: 5,

@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Slope 3 Remake</title>
-<meta name="description" content="A remake of Slope 3 in the browser. Scores post to Bluesky.">
+<meta name="description" content="A remake of Slope 3">
 <meta property="og:title" content="Slope 3 Remake">
-<meta property="og:description" content="A remake of Slope 3 in the browser. Scores post to Bluesky.">
+<meta property="og:description" content="A remake of Slope 3">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://joshuashew.com/games/slope-3-remake/">
 <meta property="og:image" content="https://joshuashew.com/games/slope-3-remake/social-card.png">
@@ -110,6 +110,14 @@ body.playing .site-bar { display: none; }
 body.playing .sound { top: calc(12px + env(safe-area-inset-top, 0px)); }
 .sound:focus-visible { outline: 2px solid var(--cyan); border-radius: 4px; }
 .sound svg { width: 30px; height: 30px; display: block; }
+.fullbtn { top: calc(58px + env(safe-area-inset-top, 0px)); right: calc(max(16px, env(safe-area-inset-right, 0px)) + 46px); background: none; border: 0; color: var(--cyan); cursor: pointer; padding: 6px; }
+.fullbtn svg { width: 28px; height: 28px; display: block; }
+.fullbtn:focus-visible { outline: 2px solid var(--cyan); border-radius: 4px; }
+body.playing .fullbtn { top: calc(12px + env(safe-area-inset-top, 0px)); }
+/* full screen: the site bar goes away and everything moves up */
+body.immersive .site-bar { display: none; }
+body.immersive .sound, body.immersive .fullbtn { top: calc(12px + env(safe-area-inset-top, 0px)); }
+body.immersive .screen { padding-top: calc(24px + env(safe-area-inset-top, 0px)); }
 .version { bottom: calc(10px + env(safe-area-inset-bottom, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); color: #6d7088; font: 600 13px/1 var(--mono); }
 
 /* ---- leaderboard ---- */
@@ -189,6 +197,9 @@ body.playing .sound { top: calc(12px + env(safe-area-inset-top, 0px)); }
 <div class="arrow r" id="arrowR" hidden aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m9 4 8 8-8 8"/></svg></div>
 <button class="corner sound" id="soundBtn" type="button" aria-label="Sound on" aria-pressed="true">
   <svg viewBox="0 0 32 32" fill="currentColor"><path d="M17 5 9 12H4v8h5l8 7z"/><path id="soundWaves" d="M21 11a7 7 0 0 1 0 10M24.5 7.5a12 12 0 0 1 0 17" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path id="soundOff" d="m21 12 8 8m0-8-8 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" hidden/></svg>
+</button>
+<button class="corner fullbtn" id="fullBtn" type="button" aria-label="Full screen" aria-pressed="false">
+  <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path id="fsOpen" d="M5 12V5h7M27 12V5h-7M5 20v7h7M27 20v7h-7"/><path id="fsClose" d="M12 5v7H5M20 5v7h7M12 27v-7H5M20 27v-7h7" hidden/></svg>
 </button>
 <div class="corner version" id="version">0.1</div>
 

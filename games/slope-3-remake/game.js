@@ -45,7 +45,8 @@
   }
   window.addEventListener("resize", resize); resize();
 
-  // ---- textures: one glowing border per 10 m tile, as in the original ---------------------------
+  // ---- textures, at the original's proportions: a 32-texel tile with a 2-texel border, smoothly
+  //      filtered, line colour = the original's texture colour times its overbright glow colour ------
   function canvasTex(size, draw, repeat) {
     var c = document.createElement("canvas"); c.width = c.height = size;
     draw(c.getContext("2d"), size);
@@ -54,26 +55,25 @@
     t.anisotropy = ANISO;
     return t;
   }
-  function grid(line, fill, lw, glow) {
-    return canvasTex(256, function (g, n) {
+  function tile(core, halo, fill) {
+    return canvasTex(64, function (g, n) {
+      var bw = n * 1 / 32;   // the gameplay footage shows half the texture file's 2-texel border
       g.fillStyle = fill; g.fillRect(0, 0, n, n);
-      g.strokeStyle = line; g.lineWidth = lw; g.shadowColor = line; g.shadowBlur = glow;
-      g.strokeRect(lw / 2, lw / 2, n - lw, n - lw);
-      g.shadowBlur = 0; g.strokeRect(lw / 2, lw / 2, n - lw, n - lw);
+      g.fillStyle = halo; g.globalAlpha = 0.28;               // a little of the original's bloom, baked in
+      g.fillRect(0, 0, n, bw * 2.2); g.fillRect(0, n - bw * 2.2, n, bw * 2.2); g.fillRect(0, 0, bw * 2.2, n); g.fillRect(n - bw * 2.2, 0, bw * 2.2, n);
+      g.globalAlpha = 1; g.fillStyle = core;
+      g.fillRect(0, 0, n, bw); g.fillRect(0, n - bw, n, bw); g.fillRect(0, 0, bw, n); g.fillRect(n - bw, 0, bw, n);
     }, true);
   }
-  var texGround = grid("#5fe3f5", "#03090f", 8, 22);
-  var texPeril = grid("#ef7cf4", "#12031a", 8, 22);
-  var texPerilThin = grid("#de79e7", "#0a0210", 4, 10);
-  var texCity = grid("#2f9fb6", "#020812", 4, 8);
-  var texArrows = canvasTex(256, function (g, n) {
-    g.fillStyle = "#03090f"; g.fillRect(0, 0, n, n);
-    g.fillStyle = "#e9fdff"; g.shadowColor = "#bff6ff"; g.shadowBlur = 18;
-    for (var k = 0; k < 3; k++) {
-      var y0 = n * (k / 3);
-      g.beginPath(); g.moveTo(n * 0.5, y0 + n * 0.04); g.lineTo(n * 0.92, y0 + n * 0.2); g.lineTo(n * 0.92, y0 + n * 0.3);
-      g.lineTo(n * 0.5, y0 + n * 0.14); g.lineTo(n * 0.08, y0 + n * 0.3); g.lineTo(n * 0.08, y0 + n * 0.2); g.closePath(); g.fill();
-    }
+  var texGround = tile("#9af2ff", "#2fb8d6", "#020609");
+  var texPeril = tile("#ff9cf7", "#d660e0", "#06020a");
+  var texPerilThin = texPeril;
+  var texCity = tile("#4fc3dc", "#1d7f96", "#010409");
+  var texArrows = canvasTex(64, function (g, n) {          // a thick V, point toward the bottom, as in the original
+    g.fillStyle = "#020609"; g.fillRect(0, 0, n, n);
+    g.fillStyle = "#9af2ff";
+    g.beginPath(); g.moveTo(n * 0.06, n * 0.12); g.lineTo(n * 0.3, n * 0.12); g.lineTo(n * 0.5, n * 0.5); g.lineTo(n * 0.7, n * 0.12);
+    g.lineTo(n * 0.94, n * 0.12); g.lineTo(n * 0.5, n * 0.88); g.closePath(); g.fill();
   }, true);
   scene.background = canvasTex(256, function (g, n) {
     var l = g.createLinearGradient(0, 0, 0, n);
@@ -102,10 +102,10 @@
     return [p[0] / cell, p[1] / cell];
   }
   function Acc() { this.p = []; this.u = []; }
-  Acc.prototype.tri = function (a, b, c, n, mat, o) {
+  Acc.prototype.tri = function (a, b, c, n, mat, o, uvs) {
     var pts = [a, b, c];
     for (var i = 0; i < 3; i++) {
-      var q = pts[i], uv = uvFor(q, n, mat);
+      var q = pts[i], uv = uvs ? uvs[i] : uvFor(q, n, mat);
       this.p.push(q[0] + o[0], q[1] + o[1], -(q[2] + o[2]));   // flip z for three.js (also flips winding)
       this.u.push(uv[0], uv[1]);
     }
@@ -130,13 +130,13 @@
         var mat = MATS[col.mat] ? col.mat : (col.death ? "Peril" : "Ground");
         if (col.mover) {   // moving obstacles get their own mesh so they can slide
           var acc1 = new Acc(), z = [0, 0, 0];
-          col.src.tris.forEach(function (t) { acc1.tri(t.a, t.b, t.c, t.n, mat, z); });
+          col.src.tris.forEach(function (t) { acc1.tri(t.a, t.b, t.c, t.n, mat, z, t.uv); });
           var m = meshOf(acc1, MATS[mat]); m.userData.col = col;
           grp.add(m); movers.push(m);
           return;
         }
         var off = P.sub(col.origin, o), acc = accs[mat] || (accs[mat] = new Acc());
-        col.src.tris.forEach(function (t) { acc.tri(t.a, t.b, t.c, t.n, mat, off); });
+        col.src.tris.forEach(function (t) { acc.tri(t.a, t.b, t.c, t.n, mat, off, t.uv); });
       });
       for (var k in accs) grp.add(meshOf(accs[k], MATS[k]));
       // wireframe-city towers beside the canyon, like the original's backdrop
@@ -173,7 +173,8 @@
 
   // ---- ball, trail, shatter, stars ---------------------------------------------------------------
   var ballGroup = new THREE.Group(), spin = new THREE.Group();
-  spin.add(new THREE.Mesh(new THREE.SphereGeometry(0.5, 24, 16), new THREE.MeshBasicMaterial({ color: 0x0c2230 })));
+  // the original ball: a glowing white wire globe over a dim translucent body
+  spin.add(new THREE.Mesh(new THREE.SphereGeometry(0.5, 24, 16), new THREE.MeshBasicMaterial({ color: 0x2a5866, transparent: true, opacity: 0.55, depthWrite: false })));
   var circ = [];
   [[1, 0, 0], [0, 1, 0], [0, 0, 1]].forEach(function (axis, c) {
     for (var i = 0; i < 48; i++) {
@@ -184,7 +185,13 @@
     }
   });
   var lg = new THREE.BufferGeometry(); lg.setAttribute("position", new THREE.Float32BufferAttribute(circ, 3));
-  spin.add(new THREE.LineSegments(lg, new THREE.LineBasicMaterial({ color: 0xe8fdff })));
+  // thick rings (browsers draw lines one pixel wide): an equator and two meridians, like the original's globe
+  var ringMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+  [[0, 0, 0], [Math.PI / 2, 0, 0], [0, Math.PI / 2, 0]].forEach(function (r) {
+    var ring = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.028, 6, 40), ringMat); ring.rotation.set(r[0], r[1], r[2]); spin.add(ring);
+  });
+  var halo = new THREE.Mesh(new THREE.SphereGeometry(0.62, 20, 14), new THREE.MeshBasicMaterial({ color: 0x4acbe1, transparent: true, opacity: 0.16, blending: THREE.AdditiveBlending, depthWrite: false }));
+  ballGroup.add(halo);
   ballGroup.add(spin); scene.add(ballGroup);
 
   var TRAIL = 22, trailPts = [], trailPos = new Float32Array(TRAIL * 6), trailCol = new Float32Array(TRAIL * 6), idx = [];
@@ -204,7 +211,7 @@
     if (reset) { trailPts = []; for (var i = 0; i < TRAIL; i++) trailPts.push(pt); }
     else { trailPts.pop(); trailPts.unshift(pt); }
     for (var j = 0; j < TRAIL; j++) {
-      var p = trailPts[j], hw = 0.4 * (1 - j / TRAIL), o = j * 6;
+      var p = trailPts[j], hw = 0.16 * (1 - j / TRAIL), o = j * 6;
       trailPos[o] = p[0] - hw; trailPos[o + 1] = p[1]; trailPos[o + 2] = p[2];
       trailPos[o + 3] = p[0] + hw; trailPos[o + 4] = p[1]; trailPos[o + 5] = p[2];
     }
@@ -308,6 +315,32 @@
     $("soundWaves").style.display = soundOn ? "" : "none";
     $("soundOff").hidden = soundOn;
   }
+  // ---- full screen: hide the site bar and, where the browser allows, take the whole screen ------------
+  var fullBtn = $("fullBtn");
+  function isFull() { return document.body.classList.contains("immersive"); }
+  function renderFull() {
+    var on = isFull();
+    fullBtn.setAttribute("aria-pressed", String(on)); fullBtn.setAttribute("aria-label", on ? "Exit full screen" : "Full screen");
+    $("fsOpen").hidden = on; $("fsClose").hidden = !on;
+    setTimeout(resize, 50);
+  }
+  function setFull(on) {
+    document.body.classList.toggle("immersive", on);
+    var el = document.documentElement, req = el.requestFullscreen || el.webkitRequestFullscreen;
+    var exit = document.exitFullscreen || document.webkitExitFullscreen, cur = document.fullscreenElement || document.webkitFullscreenElement;
+    try {
+      if (on && req && !cur) { var p = req.call(el); if (p && p.catch) p.catch(function () { /* refused: keep the bar hidden anyway */ }); }
+      if (!on && exit && cur) { var q = exit.call(document); if (q && q.catch) q.catch(function () {}); }
+    } catch (e) { /* no Fullscreen API (iPhone): hiding the bar is the whole effect */ }
+    renderFull();
+  }
+  fullBtn.addEventListener("click", function () { setFull(!isFull()); });
+  ["fullscreenchange", "webkitfullscreenchange"].forEach(function (ev) {
+    document.addEventListener(ev, function () {
+      if (!(document.fullscreenElement || document.webkitFullscreenElement) && isFull()) { document.body.classList.remove("immersive"); renderFull(); }
+    });
+  });
+  renderFull();
   ui.sound.addEventListener("click", function () { soundOn = !soundOn; save("s3r-sound", soundOn); audio.unlock(); audio.setOn(soundOn); renderSound(); });
   renderSound();
 
@@ -338,6 +371,7 @@
       else if (state === "pause") { e.preventDefault(); resume(); }
       return;
     }
+    if (e.key === "f" || e.key === "F") { setFull(!isFull()); return; }
     if (e.key === "p" || e.key === "P" || e.key === "Escape") {
       if (state === "play") pause(); else if (state === "pause") resume();
       else if (state === "board" && e.key === "Escape") showMenu();

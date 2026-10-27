@@ -26,10 +26,12 @@ var S3W = (function (P, DATA) {
       var rx = {};
       (b.randomX || []).forEach(function (m) { rx[m.collider] = m.range; });
       var cols = b.colliders.filter(function (c) { return c.enabled !== false && !c.isTrigger && c.triangles; }).map(function (c) {
+        var uv = DATA.uv && DATA.uv[c.mesh];   // the original mesh's own texture coordinates
         var tris = c.triangles.map(function (t) {
           var a = c.vertices[t[0]], bb = c.vertices[t[1]], cc = c.vertices[t[2]];
           var n = cross(sub(bb, a), sub(cc, a)), nl = len(n);
-          return { a: a, b: bb, c: cc, n: nl > 0 ? mul(n, 1 / nl) : [0, 1, 0] };
+          return { a: a, b: bb, c: cc, n: nl > 0 ? mul(n, 1 / nl) : [0, 1, 0],
+            uv: uv ? [uv[t[0]], uv[t[1]], uv[t[2]]] : null };
         }).filter(function (t) { return len(t.n) > 0; });
         var lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9];
         c.vertices.forEach(function (v) { for (var i = 0; i < 3; i++) { lo[i] = Math.min(lo[i], v[i]); hi[i] = Math.max(hi[i], v[i]); } });
@@ -163,7 +165,7 @@ var S3W = (function (P, DATA) {
         var tris = col.src.tris;
         for (var j = 0; j < tris.length; j++) {
           var tr = tris[j];
-          out.push({ id: col.id, kind: "tri", death: col.death, vel: vel, a: add(tr.a, o), b: add(tr.b, o), c: add(tr.c, o), n: tr.n, mu: col.mat === "invisible" ? 0.75 : 0.85 });
+          out.push({ id: col.id, kind: "tri", death: col.death, vel: vel, a: add(tr.a, o), b: add(tr.b, o), c: add(tr.c, o), n: tr.n, mu: col.mat === "invisible" ? 0.97 : 0.85 });   // 0.97 measured from the original's ball on its decks (Unity's averaging rule predicts 0.75, but the live game slows like 0.96-0.99)
         }
       }
     }
