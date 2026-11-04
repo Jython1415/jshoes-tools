@@ -13,6 +13,9 @@ The site behind **[joshuashew.com](https://joshuashew.com)** (and its mirror at
 | [`/artifacts/transcript/`](https://joshuashew.com/artifacts/transcript/) | MacAskill / 80,000 Hours — synchronized transcript viewer (moved from `/transcript/`, which 301s here via `_redirects`) |
 | [`/tools/`](https://joshuashew.com/tools/) | Index of interactive pages and viewers |
 | [`/margin/`](https://joshuashew.com/margin/) | Margin annotations on a web page, read live from the author's AT Protocol repo |
+| [`/games/`](https://joshuashew.com/games/) | Index of browser games |
+| [`/games/slope-3-remake/`](https://joshuashew.com/games/slope-3-remake/) | Slope 3 Remake — a remake of the browser game Slope 3, rebuilt from its measured block shapes, spacing and physics; scores post to Bluesky as `com.joshuashew.games.score` records |
+| `/games/client-metadata.json` | Not a page: the AT Protocol OAuth client metadata for Bluesky sign-in in the games. Its `client_id` is its own URL; add each game's page to `redirect_uris` |
 
 ## Infrastructure
 
@@ -29,11 +32,11 @@ the shared `/site-bar.css`:
 
 ```html
 <link rel="stylesheet" href="/site-bar.css">   <!-- in <head> -->
-<header class="site-bar" style="--sb-max:720px;--sb-pad:1.4rem"><nav aria-label="Site"><a class="sb-home" href="/">joshuashew.com</a><a href="/tools/">Tools</a><a href="/artifacts/">Artifacts</a></nav></header>
+<header class="site-bar" style="--sb-max:720px;--sb-pad:1.4rem"><nav aria-label="Site"><a class="sb-home" href="/">joshuashew.com</a><a href="/tools/">Tools</a><a href="/artifacts/">Artifacts</a><a href="/games/">Games</a></nav></header>
 ```
 
 - The bar links to **sections**, not pages, so adding a page never touches the bar on
-  other pages. A new page gets a card on its section's index (`/artifacts/` or `/tools/`)
+  other pages. A new page gets a card on its section's index (`/artifacts/`, `/tools/` or `/games/`)
   and on the home page.
 - Mark the current section with `aria-current="page"` on its link (on the home page,
   on `joshuashew.com`).
@@ -75,6 +78,19 @@ jshoes-tools/
 │   └── index.html          # index of interactive pages
 ├── margin/
 │   └── index.html          # Margin annotations viewer (backed by functions/)
+├── games/
+│   ├── index.html          # index of games
+│   ├── client-metadata.json  # Bluesky (AT Protocol) OAuth client for the games
+│   └── slope-3-remake/
+│       ├── index.html      # page, menu, leaderboard and results screens
+│       ├── blocks.js       # block shapes, triggers and spacing measured from the original
+│       ├── phys.js         # collision primitives (sphere vs box and triangle)
+│       ├── ball.js         # rigid-body ball: forces, drag, friction, spin cap, triggers
+│       ├── world.js        # places blocks section by section, as the original's loader does
+│       ├── cfg.js          # ball settings from the original
+│       ├── game.js         # Three.js renderer, camera, audio, input, game flow
+│       ├── atp.js          # Bluesky sign-in, posting scores, reading the leaderboard
+│       └── social-card.png
 ├── functions/              # Cloudflare Pages Functions for /margin/
 ├── social-card.png         # OG image for the transcript page (kept at the root; the page links it by absolute URL)
 └── README.md
@@ -85,3 +101,4 @@ jshoes-tools/
 Pages under `/artifacts/` are written by Claude and are labelled on the page itself
 with the model that produced them, alongside the verbatim prompt. `/artifacts/allston/`
 was researched and written by Claude Opus 5. `/artifacts/transcript/` was built by Claude Sonnet 4.6.
+`/games/slope-3-remake/` was built by Claude.
