@@ -20,3 +20,13 @@
 /forward-codes/forward-codes-to-joshua.shortcut
   Content-Type: application/octet-stream
   Content-Disposition: attachment; filename="Forward Codes to Joshua.shortcut"
+
+# Approvals card links (/a/<kind>/<id>). Apple fetches this file through its CDN to let the Approvals
+# app (com.joshuashew.approvals) open those links; it must be served as JSON with no redirect.
+/.well-known/apple-app-site-association
+  Content-Type: application/json
+  Cache-Control: public, max-age=3600
+
+/a/*
+  X-Robots-Tag: noindex, nofollow
+  Referrer-Policy: no-referrer

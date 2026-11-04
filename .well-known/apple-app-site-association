@@ -1,0 +1,12 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["266A89QX9M.com.joshuashew.approvals"],
+        "components": [
+          { "/": "/a/*/*", "comment": "One Approvals card: /a/<kind>/<id> opens it in the Approvals app" }
+        ]
+      }
+    ]
+  }
+}
