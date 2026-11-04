@@ -10,7 +10,7 @@ const OAUTH_LIB = "https://cdn.jsdelivr.net/npm/@atproto/oauth-client-browser@0.
 
 export function createScores({ site, game, accept }) {
   const enabled = location.origin === ORIGIN;
-  let client = null, session = null, handle = null;
+  let client = null, ready = null, session = null, handle = null;
 
   async function profileHandle(did) {
     try {
@@ -20,11 +20,21 @@ export function createScores({ site, game, accept }) {
     return null;
   }
 
+  async function loadClient() {
+    const { BrowserOAuthClient } = await import(OAUTH_LIB);
+    // BrowserOAuthClient is not an EventTarget: a session revoked or expired elsewhere is reported
+    // through the onSessionDeleted option (@atproto/oauth-client-browser 0.5.9, browser-oauth-client.js).
+    return BrowserOAuthClient.load({
+      clientId: CLIENT_ID,
+      handleResolver: "https://bsky.social",
+      onSessionDeleted: () => { session = null; handle = null; }
+    });
+  }
+
   async function init() {
     if (!enabled) return { enabled: false };
-    const { BrowserOAuthClient } = await import(OAUTH_LIB);
-    client = await BrowserOAuthClient.load({ clientId: CLIENT_ID, handleResolver: "https://bsky.social" });
-    client.addEventListener("deleted", () => { session = null; handle = null; });
+    ready = loadClient();
+    client = await ready;
     const res = await client.init();
     if (res && res.session) {
       session = res.session;
@@ -34,6 +44,8 @@ export function createScores({ site, game, accept }) {
   }
 
   async function signIn(input) {
+    // A click in the first seconds after page load can arrive while the library is still loading.
+    if (!client && ready) { try { client = await ready; } catch (e) { /* reported below */ } }
     if (!client) throw new Error("Sign-in is not available here");
     const h = String(input || "").trim().replace(/^@/, "");
     if (!h) throw new Error("Enter your Bluesky handle");
