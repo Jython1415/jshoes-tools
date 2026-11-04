@@ -4,7 +4,7 @@
 // the relay lists repos holding the collection, then each repo's records are read from its PDS.
 const NSID = "com.joshuashew.games.score";
 const ORIGIN = "https://joshuashew.com";
-const CLIENT_ID = ORIGIN + "/games/client-metadata.json";
+const CLIENT_ID = ORIGIN + "/oauth-client-metadata.json";
 const RELAY = "https://relay1.us-east.bsky.network";
 const OAUTH_LIB = "https://cdn.jsdelivr.net/npm/@atproto/oauth-client-browser@0.5.9/+esm";
 

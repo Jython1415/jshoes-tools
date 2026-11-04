@@ -15,7 +15,8 @@ The site behind **[joshuashew.com](https://joshuashew.com)** (and its mirror at
 | [`/margin/`](https://joshuashew.com/margin/) | Margin annotations on a web page, read live from the author's AT Protocol repo |
 | [`/games/`](https://joshuashew.com/games/) | Index of browser games |
 | [`/games/slope-3-remake/`](https://joshuashew.com/games/slope-3-remake/) | Slope 3 Remake — a remake of the browser game Slope 3, rebuilt from its measured block shapes, spacing and physics; scores post to Bluesky as `com.joshuashew.games.score` records |
-| `/games/client-metadata.json` | Not a page: the AT Protocol OAuth client metadata for Bluesky sign-in in the games. Its `client_id` is its own URL; add each game's page to `redirect_uris` |
+| `/oauth-client-metadata.json` | Not a page: the AT Protocol OAuth client metadata for Bluesky sign-in in the games. Its `client_id` is its own URL; add each game's page to `redirect_uris`. At this exact root path, Bluesky's consent screen names the app "joshuashew.com" instead of the full URL |
+| `/games/client-metadata.json` | Not a page: the previous OAuth client metadata, kept so sessions issued to it can still refresh. Not used for new sign-ins |
 
 ## Infrastructure
 
@@ -62,6 +63,7 @@ Pages written by Claude go under `/artifacts/` so the provenance is legible from
 ```
 jshoes-tools/
 ├── index.html              # site root
+├── oauth-client-metadata.json  # Bluesky (AT Protocol) OAuth client for the games
 ├── site-bar.css            # shared navigation bar (see Navigation)
 ├── avatar-photo.jpg        # home-page avatars: headshot and penguin (EXIF stripped)
 ├── avatar-penguin.png
@@ -80,7 +82,7 @@ jshoes-tools/
 │   └── index.html          # Margin annotations viewer (backed by functions/)
 ├── games/
 │   ├── index.html          # index of games
-│   ├── client-metadata.json  # Bluesky (AT Protocol) OAuth client for the games
+│   ├── client-metadata.json  # previous OAuth client, kept for existing sessions
 │   └── slope-3-remake/
 │       ├── index.html      # page, menu, leaderboard and results screens
 │       ├── blocks.js       # block shapes, triggers and spacing measured from the original
