@@ -66,6 +66,8 @@ body.playing .site-bar { display: none; }
   padding: 0.55em 0.8em;
 }
 .slant:hover > span, .slant:focus-visible > span { background: #30335a; }
+.slant { transition: filter 0.15s; }
+.slant:hover { filter: drop-shadow(0 0 6px rgba(74, 203, 225, 0.55)); }
 .slant:focus-visible { outline: none; filter: drop-shadow(0 0 8px var(--cyan)); }
 .slant.big { font-size: clamp(30px, 8vw, 54px); }
 .slant.small { font-size: clamp(14px, 3.4vw, 18px); --cut: 12px; }
@@ -73,7 +75,9 @@ body.playing .site-bar { display: none; }
 /* ---- menu & board screens ---- */
 .screen {
   position: fixed; inset: 0; z-index: 20; overflow-y: auto;
-  background: linear-gradient(180deg, var(--menu-top), var(--menu-bottom));
+  background:
+    radial-gradient(120% 70% at 50% 0%, rgba(118, 70, 200, 0.22), transparent 60%),
+    linear-gradient(180deg, rgba(74, 78, 98, 0.84), rgba(27, 26, 51, 0.93) 55%, rgba(14, 14, 32, 0.96));
   padding: calc(64px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) calc(28px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
   display: grid; justify-items: center; align-content: start; touch-action: pan-y;
 }
@@ -81,7 +85,7 @@ body.playing .site-bar { display: none; }
 .game-title {
   margin: 4px 0 6px; text-align: center; color: var(--cyan);
   font: 900 clamp(38px, 11vw, 74px)/1 var(--title); letter-spacing: 0.08em; text-transform: uppercase;
-  text-shadow: 0 0 18px rgba(74, 203, 225, 0.35);
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.55), 0 0 14px rgba(74, 203, 225, 0.55), 0 0 42px rgba(118, 70, 200, 0.55);
 }
 .label { color: #b9bccb; font: 600 clamp(13px, 3.2vw, 16px)/1 var(--title); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px; }
 .field { --fill: #262841; cursor: text; }
@@ -137,8 +141,10 @@ body.immersive .screen { padding-top: calc(24px + env(safe-area-inset-top, 0px))
 .score {
   position: fixed; top: calc(14px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); z-index: 10;
   font: 900 clamp(40px, 9vw, 64px)/1 var(--title); color: #fff; letter-spacing: 0.04em; font-variant-numeric: tabular-nums;
-  text-shadow: 0 0 12px rgba(0, 0, 0, 0.6); pointer-events: none;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.8), 0 0 16px rgba(74, 203, 225, 0.55); pointer-events: none;
 }
+.score.bump { animation: bump 0.32s ease-out; }
+@keyframes bump { 0% { transform: translateX(-50%) scale(1.22); color: #c9f6ff; } 100% { transform: translateX(-50%) scale(1); } }
 .hint {
   position: fixed; left: 50%; top: 26%; transform: translateX(-50%); z-index: 10; pointer-events: none;
   color: var(--hint); font: 600 clamp(16px, 3.6vw, 24px)/1.2 var(--title); letter-spacing: 0.04em; text-align: center; white-space: nowrap;
@@ -146,10 +152,17 @@ body.immersive .screen { padding-top: calc(24px + env(safe-area-inset-top, 0px))
 }
 .speedup {
   position: fixed; left: 50%; bottom: calc(4% + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 10; pointer-events: none;
-  color: var(--pink); font: 900 clamp(24px, 6vw, 40px)/1 var(--title); letter-spacing: 0.12em; text-transform: uppercase;
-  text-shadow: 0 0 16px rgba(253, 133, 239, 0.7); opacity: 0; transition: opacity 0.25s;
+  color: #ffd2f8; font: 900 italic clamp(24px, 6vw, 40px)/1 var(--title); letter-spacing: 0.12em; text-transform: uppercase;
+  text-shadow: -2px 0 0 rgba(74, 203, 225, 0.85), 2px 0 0 rgba(253, 133, 239, 0.9), 0 0 18px rgba(253, 133, 239, 0.75);
+  opacity: 0; transition: opacity 0.4s;
 }
-.speedup.on { opacity: 1; }
+.speedup.on { opacity: 1; animation: rush 0.45s cubic-bezier(0.2, 0.9, 0.3, 1); }
+@keyframes rush { 0% { transform: translateX(-50%) scaleX(1.6); letter-spacing: 0.5em; opacity: 0; } 100% { transform: translateX(-50%) scaleX(1); letter-spacing: 0.12em; opacity: 1; } }
+/* screen-edge pulse on a speed-up (cyan/violet) and a crash (magenta); compositor-only opacity animation */
+.fx { position: fixed; inset: 0; z-index: 9; pointer-events: none; opacity: 0; }
+.fx.boost { background: radial-gradient(ellipse 75% 70% at 50% 55%, transparent 55%, rgba(74, 203, 225, 0.22) 80%, rgba(118, 70, 200, 0.45)); animation: pulse 0.9s ease-out; }
+.fx.crash { background: radial-gradient(ellipse 70% 65% at 50% 50%, rgba(253, 133, 239, 0.08) 30%, rgba(253, 133, 239, 0.35) 85%, rgba(150, 40, 160, 0.6)); animation: pulse 0.7s ease-out; }
+@keyframes pulse { 0% { opacity: 1; } 100% { opacity: 0; } }
 .pausebtn { top: calc(12px + env(safe-area-inset-top, 0px)); left: max(16px, env(safe-area-inset-left, 0px)); background: none; border: 0; color: rgba(255,255,255,0.75); cursor: pointer; padding: 8px; }
 .pausebtn svg { width: 26px; height: 26px; display: block; }
 .pausebtn:focus-visible { outline: 2px solid var(--cyan); border-radius: 4px; }
@@ -161,27 +174,42 @@ body.immersive .screen { padding-top: calc(24px + env(safe-area-inset-top, 0px))
 .arrow svg { width: 38px; height: 38px; }
 .arrow.l { left: max(18px, env(safe-area-inset-left, 0px)); }
 .arrow.r { right: max(18px, env(safe-area-inset-right, 0px)); }
-.arrow.on { background: rgba(74, 203, 225, 0.3); }
+.arrow.on { background: rgba(74, 203, 225, 0.3); box-shadow: 0 0 18px rgba(74, 203, 225, 0.45); }
 @media (hover: hover) and (pointer: fine) { .arrow { display: none; } }
 
 /* ---- results and pause panels (over the 3D scene, like the original) ---- */
-.panelwrap { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); background: rgba(10, 12, 28, 0.45); }
+.panelwrap { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); background: radial-gradient(ellipse 80% 70% at 50% 50%, rgba(10, 12, 28, 0.3), rgba(6, 6, 18, 0.72)); }
+/* panel: the buttons' slanted cut on two corners, a violet-to-cyan rim and a soft glow around the shape */
 .panel {
-  width: min(420px, 100%); display: grid; gap: 18px; padding: 26px 24px 24px;
-  background: linear-gradient(180deg, rgba(74, 78, 98, 0.92), rgba(27, 26, 51, 0.94));
-  border: 2px solid; border-image: linear-gradient(90deg, var(--violet), var(--cyan)) 1;
+  --c: 22px;
+  position: relative; isolation: isolate; width: min(420px, 100%); display: grid; gap: 18px; padding: 28px 26px 26px;
+  filter: drop-shadow(0 0 16px rgba(74, 203, 225, 0.28)) drop-shadow(0 0 40px rgba(118, 70, 200, 0.3));
+  animation: panelIn 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
 }
-.panel h2 { margin: 0; text-align: center; color: var(--cyan); font: 900 clamp(26px, 7vw, 38px)/1 var(--title); letter-spacing: 0.1em; text-transform: uppercase; }
+.panel::before, .panel::after { content: ""; position: absolute; z-index: -1; clip-path: polygon(var(--c) 0, 100% 0, 100% calc(100% - var(--c)), calc(100% - var(--c)) 100%, 0 100%, 0 var(--c)); }
+.panel::before { inset: 0; background: linear-gradient(120deg, var(--violet), var(--cyan) 55%, var(--pink)); z-index: -2; }
+.panel::after {
+  inset: 2px; --c: 21px;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 4px),
+    linear-gradient(180deg, rgba(58, 60, 88, 0.96), rgba(22, 20, 44, 0.97));
+}
+@keyframes panelIn { 0% { opacity: 0; transform: translateY(14px) scale(0.96); } 100% { opacity: 1; transform: none; } }
+.panel h2 { margin: 0; text-align: center; color: var(--cyan); font: 900 clamp(26px, 7vw, 38px)/1 var(--title); letter-spacing: 0.1em; text-transform: uppercase; text-shadow: 0 0 2px rgba(255, 255, 255, 0.5), 0 0 16px rgba(74, 203, 225, 0.6); }
+.panel h2::after { content: ""; display: block; height: 2px; width: 46%; margin: 14px auto 0; background: linear-gradient(90deg, transparent, var(--violet), var(--cyan), transparent); }
 .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: center; }
 .stats .k { color: #b9bccb; font: 600 12px/1 var(--title); letter-spacing: 0.16em; text-transform: uppercase; }
 .stats .v { font: 900 clamp(34px, 9vw, 48px)/1.1 var(--title); font-variant-numeric: tabular-nums; }
-.stats .v.new { color: var(--cyan); text-shadow: 0 0 14px rgba(74, 203, 225, 0.6); }
+.stats > div + div { border-left: 1px solid rgba(74, 203, 225, 0.22); }
+.stats .v { text-shadow: 0 0 12px rgba(255, 255, 255, 0.25); }
+.stats .v.new { color: var(--cyan); text-shadow: 0 0 14px rgba(74, 203, 225, 0.7); animation: newbest 1.4s ease-in-out 0.3s 2; }
+@keyframes newbest { 50% { text-shadow: 0 0 6px #fff, 0 0 26px rgba(74, 203, 225, 1); } }
 .status { text-align: center; color: var(--muted); font-size: 14px; line-height: 1.5; min-height: 1.5em; margin: 0; }
 .status.ok { color: var(--hint); }
 .status.err { color: var(--pink); }
 .status button { background: none; border: 0; color: var(--cyan); font: inherit; text-decoration: underline; cursor: pointer; padding: 0 2px; }
 .btnrow { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-@media (prefers-reduced-motion: reduce) { .hint, .speedup { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .hint, .speedup { transition: none; } .speedup.on, .score.bump, .panel, .stats .v.new { animation: none; } .fx { display: none; } }
 </style>
 </head>
 <body>
@@ -191,6 +219,7 @@ body.immersive .screen { padding-top: calc(24px + env(safe-area-inset-top, 0px))
 
 <div class="score" id="score" hidden>0</div>
 <div class="hint" id="hint" hidden>Steer with arrows or a/d</div>
+<div class="fx" id="fx" aria-hidden="true"></div>
 <div class="speedup" id="speedup" aria-hidden="true">Speed up</div>
 <button class="corner pausebtn" id="pauseBtn" type="button" aria-label="Pause" hidden><svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="4" width="5" height="16"/><rect x="14" y="4" width="5" height="16"/></svg></button>
 <div class="arrow l" id="arrowL" hidden aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M15 4 7 12l8 8"/></svg></div>
@@ -258,16 +287,23 @@ body.immersive .screen { padding-top: calc(24px + env(safe-area-inset-top, 0px))
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="blocks.js"></script>
-<script src="phys.js"></script>
-<script src="ball.js"></script>
-<script src="world.js"></script>
-<script src="cfg.js"></script>
-<script src="game.js"></script>
+<script>
+  // Release stamp: bump V on every change to any of these scripts. The .js files are cached for hours
+  // while this page revalidates, so a new V makes every browser fetch the matching scripts.
+  (function () {
+    var V = "2026-11-04b";
+    window.S3R_VERSION = V;
+    ["blocks.js", "phys.js", "ball.js", "world.js", "cfg.js", "game.js"].forEach(function (f) {
+      var s = document.createElement("script"); s.src = f + "?v=" + V; s.async = false;   // run in order
+      document.body.appendChild(s);
+    });
+  })();
+</script>
 <script type="module">
-  import { createScores } from "./atp.js";
-  window.NGScores = createScores;
-  window.dispatchEvent(new Event("ng-scores-ready"));
+  import("./atp.js?v=" + window.S3R_VERSION).then(function (m) {
+    window.NGScores = m.createScores;
+    window.dispatchEvent(new Event("ng-scores-ready"));
+  });
 </script>
 </body>
 </html>

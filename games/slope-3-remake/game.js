@@ -20,7 +20,106 @@
   function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage blocked */ } }
   var best = load("s3r-best", null), pending = load("s3r-pending", null), soundOn = load("s3r-sound", true);
 
-  function fail(msg) { ui.authNote.textContent = msg; ui.authNote.className = "note err"; $("playBtn").disabled = true; }
+  // The menu, Bluesky sign-in and the leaderboard are wired up BEFORE the 3D setup, so they still work
+  // when WebGL is unavailable; only Play is disabled then. (Function declarations below are hoisted,
+  // so showMenu/showOnly/setPlaying are callable from here.)
+  var state = "menu", glFail = "", audio = null, overTimer = 0;
+  // ---- scores on Bluesky -------------------------------------------------------------------------------
+  var scores = null;
+  function accept(v) {
+    // A run's score must fit its own distance and time. Not proof, but it drops nonsense.
+    if (!Number.isInteger(v.value) || v.value < 0 || v.value > 50000) return false;
+    var m = /dist=(\d+)\b.*\bt=([\d.]+)/.exec(v.detail || "");
+    if (!m) return false;
+    var dist = +m[1], t = +m[2];
+    if (!(t > 0) || dist > t * 400 + 100) return false;
+    return v.value <= dist / 35 + 3;
+  }
+  function detailOf(run) { return "seed=" + run.seed + " dist=" + run.dist + " t=" + run.t + " v=" + VERSION; }
+  function postedBest() { return scores && scores.did ? load("s3r-posted:" + scores.did, 0) : 0; }
+  function setStatus(text, cls, retry) {
+    ui.postStatus.textContent = text; ui.postStatus.className = "status" + (cls ? " " + cls : "");
+    if (retry) { var b = document.createElement("button"); b.type = "button"; b.textContent = "Try again"; b.addEventListener("click", retry); ui.postStatus.append(" ", b); }
+  }
+  function postRun(run, onDone) {
+    scores.post({ value: run.score, detail: detailOf(run) }).then(function () {
+      save("s3r-posted:" + scores.did, run.score);
+      if (pending && pending.score <= run.score) { pending = null; save("s3r-pending", null); }
+      onDone(null);
+    }, function (err) { onDone(err); });
+  }
+  function maybePost(run) {
+    if (run.score <= 0) return;
+    if (scores && scores.did) {
+      if (run.score <= postedBest()) return;
+      var attempt = function () {
+        setStatus("Posting to the leaderboard…");
+        postRun(run, function (err) { if (err) setStatus("Couldn't post: " + err.message, "err", attempt); else setStatus("New best posted to the leaderboard.", "ok"); });
+      };
+      attempt();
+    } else if (!pending || run.score > pending.score) {
+      if (best && best.score === run.score) { pending = run; save("s3r-pending", pending); }
+      if (scores && scores.enabled) setStatus("Sign in on the menu to post this score.");
+    }
+  }
+  function renderAuth() {
+    var on = !!(scores && scores.did);
+    ui.signedOut.hidden = on; ui.signedIn.hidden = !on;
+    if (on) ui.whoHandle.textContent = "@" + (scores.handle || scores.did);
+  }
+  function note(text, err) {   // a missing-WebGL message stays in front of anything the sign-in flow says
+    if (glFail) text = text ? glFail + " " + text : glFail;
+    ui.authNote.textContent = text || ""; ui.authNote.className = "note" + (err || glFail ? " err" : "");
+  }
+  function startScores() {
+    scores = window.NGScores({ site: SITE, game: GAME, accept: accept });
+    if (!scores.enabled) { ui.handle.disabled = true; $("signInBtn").disabled = true; note("Sign-in works on joshuashew.com."); return; }
+    scores.init().then(function (r) {
+      renderAuth();
+      if (r.did && pending && pending.score > postedBest()) {
+        note("Posting your best score…");
+        postRun(pending, function (err) { note(err ? "Couldn't post your best score: " + err.message : "Posted your best score: " + (best ? best.score : ""), !!err); });
+      }
+    }, function (err) { note("Bluesky sign-in is unavailable right now (" + err.message + ").", true); });
+  }
+  function doSignIn() {
+    if (!scores || !scores.enabled) return;
+    note("Opening Bluesky…");
+    scores.signIn(ui.handle.value).catch(function (err) { note(err.message, true); });
+  }
+  $("signInBtn").addEventListener("click", doSignIn);
+  ui.handle.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); doSignIn(); } });
+  $("signOutBtn").addEventListener("click", function () { scores.signOut().then(function () { renderAuth(); note(""); }); });
+  if (window.NGScores) startScores(); else window.addEventListener("ng-scores-ready", startScores, { once: true });
+
+  var boardCache = null;
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function renderBoard(rows) {
+    ui.boardRows.innerHTML = "";
+    var me = scores && scores.did;
+    rows.slice(0, 100).forEach(function (r, i) {
+      var li = document.createElement("li"); if (r.did === me) li.className = "me";
+      li.innerHTML = '<span class="n">' + (i + 1) + '</span><span class="h"><a href="https://bsky.app/profile/' + esc(r.did) + '" target="_blank" rel="noopener">@' + esc(r.handle) + '</a></span><span class="v">' + r.value + "</span>";
+      ui.boardRows.appendChild(li);
+    });
+    ui.boardNote.textContent = rows.length ? "" : "No scores yet. Sign in and finish a run to post the first one.";
+  }
+  function loadBoard(force) {
+    if (!scores) { ui.boardNote.textContent = "Loading…"; return; }
+    if (boardCache && !force && Date.now() - boardCache.at < 60000) { renderBoard(boardCache.rows); return; }
+    ui.boardNote.textContent = "Loading scores from Bluesky…"; ui.boardRows.innerHTML = "";
+    scores.board().then(function (rows) { boardCache = { at: Date.now(), rows: rows }; if (state === "board") renderBoard(rows); },
+      function (err) { ui.boardNote.textContent = "Couldn't load the leaderboard: " + err.message; });
+  }
+  $("boardBtn").addEventListener("click", function () { state = "board"; showOnly(ui.board); loadBoard(false); });
+  $("boardRefresh").addEventListener("click", function () { loadBoard(true); });
+  $("boardBack").addEventListener("click", showMenu);
+
+  function fail(msg) {
+    glFail = msg; note(""); $("playBtn").disabled = true;
+    showMenu();
+    window.addEventListener("keydown", function (e) { if (e.key === "Escape" && state === "board") showMenu(); });
+  }
   if (!window.THREE) return fail("The 3D library did not load. Check your connection and reload the page.");
   var THREE = window.THREE, P = window.S3P, W = window.S3W, B = window.S3B, CFG = window.S3CFG;
 
@@ -68,24 +167,64 @@
   var texGround = tile("#9af2ff", "#2fb8d6", "#020609");
   var texPeril = tile("#ff9cf7", "#d660e0", "#06020a");
   var texPerilThin = texPeril;
-  var texCity = tile("#4fc3dc", "#1d7f96", "#010409");
+  // City facades: one 10 m storey-grid cell per tile, dim cyan mullions and scattered lit windows
+  // (mostly cyan, some magenta and white). Mipmapping turns the windows into a soft glow at distance.
+  var texCity = canvasTex(128, function (g, n) {
+    g.fillStyle = "#03070d"; g.fillRect(0, 0, n, n);
+    var cols = 4, rows = 5, cw = n / cols, rh = n / rows, seed = 7;
+    function r() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+    for (var cy = 0; cy < rows; cy++) for (var cx = 0; cx < cols; cx++) {
+      var lit = r(), hue = r();
+      g.fillStyle = lit < 0.42 ? (hue < 0.62 ? "#57d8f2" : hue < 0.8 ? "#ff7fe6" : "#e4fbff") : "#0a1824";
+      if (lit < 0.42) g.globalAlpha = 0.55 + r() * 0.45;
+      g.fillRect(cx * cw + cw * 0.22, cy * rh + rh * 0.24, cw * 0.56, rh * 0.42);
+      g.globalAlpha = 1;
+    }
+    g.fillStyle = "#2a9fbd"; g.fillRect(0, 0, n, 3); g.fillRect(0, 0, 3, n);   // cell edges (wrap supplies the other two)
+  }, true);
   var texArrows = canvasTex(64, function (g, n) {          // a thick V, point toward the bottom, as in the original
     g.fillStyle = "#020609"; g.fillRect(0, 0, n, n);
     g.fillStyle = "#9af2ff";
     g.beginPath(); g.moveTo(n * 0.06, n * 0.12); g.lineTo(n * 0.3, n * 0.12); g.lineTo(n * 0.5, n * 0.5); g.lineTo(n * 0.7, n * 0.12);
     g.lineTo(n * 0.94, n * 0.12); g.lineTo(n * 0.5, n * 0.88); g.closePath(); g.fill();
   }, true);
-  scene.background = canvasTex(256, function (g, n) {
-    var l = g.createLinearGradient(0, 0, 0, n);
-    l.addColorStop(0, "#050a17"); l.addColorStop(0.42, "#0b2234"); l.addColorStop(0.62, "#11384a"); l.addColorStop(1, "#0a1a26");
-    g.fillStyle = l; g.fillRect(0, 0, n, n);
-  }, false);
+  // ---- sky: a dome around the camera, coloured per vertex (no texture, no shader), drawn LAST at the
+  //      far end of the depth range so it only shades pixels nothing else covered. The camera looks
+  //      ~52 degrees down, so what shows is mostly the abyss below the track: indigo near the horizon,
+  //      deepening downward, with a teal glow where the track runs out and a violet haze around it. ----
+  var FWD = new THREE.Vector3(0, -Math.SQRT1_2, -Math.SQRT1_2);   // the slope's direction (three coords)
+  function skyColor(d, out) {
+    var e = d.y, c;
+    var zen = [0.010, 0.016, 0.050], hor = [0.085, 0.045, 0.150], abyss = [0.020, 0.060, 0.115], deep = [0.008, 0.016, 0.040];
+    function mix(a, b, t) { t = Math.max(0, Math.min(1, t)); return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
+    function ss(a, b, x) { var t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); }
+    if (e >= 0) c = mix(hor, zen, Math.sqrt(e) * 1.4);
+    else { c = mix(hor, abyss, ss(0, 0.4, -e)); c = mix(c, deep, ss(0.62, 1, -e)); }
+    var g = Math.max(0, d.dot(FWD)), core = Math.pow(g, 12), wide = Math.pow(g, 4);
+    var side = Math.pow(Math.max(0, 1 - Math.abs(e + 0.15) * 2.2), 3) * (0.6 + 0.4 * Math.abs(d.x));   // faint magenta band below the horizon
+    out.setRGB(c[0] + core * 0.09 + wide * 0.045 + side * 0.035,
+               c[1] + core * 0.24 + wide * 0.020 + side * 0.006,
+               c[2] + core * 0.28 + wide * 0.070 + side * 0.040);
+    return out;
+  }
+  var skyGeo = new THREE.SphereGeometry(2800, 48, 32);
+  skyGeo.scale(-1, 1, 1);   // inside-out, so its faces are front faces seen from the centre
+  (function () {
+    var pos = skyGeo.attributes.position, col = new Float32Array(pos.count * 3), v = new THREE.Vector3(), c = new THREE.Color();
+    for (var i = 0; i < pos.count; i++) { skyColor(v.fromBufferAttribute(pos, i).normalize(), c); col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b; }
+    skyGeo.setAttribute("color", new THREE.BufferAttribute(col, 3));
+  })();
+  var sky = new THREE.Mesh(skyGeo, new THREE.MeshBasicMaterial({ vertexColors: true, fog: false, depthWrite: false }));
+  sky.renderOrder = 1e6; sky.frustumCulled = false; scene.add(sky);
+  // fog fades distant track into the sky just above where the slope vanishes
+  scene.fog.color.copy(skyColor(new THREE.Vector3(0, -0.62, -0.78).normalize(), new THREE.Color()));
+  renderer.setClearColor(scene.fog.color);
   var MATS = {
     Ground: new THREE.MeshBasicMaterial({ map: texGround }),
     GroundArrows: new THREE.MeshBasicMaterial({ map: texArrows }),
     Peril: new THREE.MeshBasicMaterial({ map: texPeril }),
     PerilThin: new THREE.MeshBasicMaterial({ map: texPerilThin }),
-    City: new THREE.MeshBasicMaterial({ map: texCity })
+    City: new THREE.MeshBasicMaterial({ map: texCity, vertexColors: true })
   };
   var ALL_TEX = [texGround, texPeril, texPerilThin, texCity, texArrows];
 
@@ -115,6 +254,7 @@
     var g = new THREE.BufferGeometry();
     g.setAttribute("position", new THREE.Float32BufferAttribute(acc.p, 3));
     g.setAttribute("uv", new THREE.Float32BufferAttribute(acc.u, 2));
+    if (acc.c) g.setAttribute("color", new THREE.Float32BufferAttribute(acc.c, 3));
     g.computeBoundingSphere();
     var m = new THREE.Mesh(g, mat);   // front faces only, as the original draws them
     return m;
@@ -167,13 +307,21 @@
           var off = col ? P.sub(col.origin, o) : bo;   // follows the collider's random sideways placement
           addRenderer(r, function (n) { return accs[n] || (accs[n] = new Acc()); }, off, col);
         });
-        // wireframe-city towers beside the canyon, like the original's backdrop
+        // City backdrop: towers flanking the canyon (as in the original), plus a lower, wider skyline
+        // the track runs above, so the sides of the view show a lit city falling away into the haze.
         var span = Math.max(40, (blk.spec.name === "5 Obstacle" ? 230 : 120)), city = accs.City || (accs.City = new Acc());
         for (var s = 0; s < span; s += 22 + rnd() * 18) {
           for (var side = -1; side <= 1; side += 2) {
             var x0 = 5 + side * (38 + rnd() * 40), w = 10 + rnd() * 18, top = 10 + rnd() * 45, d = 18 + rnd() * 20;
             var z0 = s * SQ2 + bo[2], y0 = -s * SQ2 + top + bo[1];
-            box(city, [Math.min(x0, x0 + side * w) + bo[0], y0 - 160, z0], [Math.max(x0, x0 + side * w) + bo[0], y0, z0 + d]);
+            box(city, [Math.min(x0, x0 + side * w) + bo[0], y0 - 120, z0], [Math.max(x0, x0 + side * w) + bo[0], y0, z0 + d], 120);
+          }
+        }
+        for (var s2 = rnd() * 30; s2 < span; s2 += 44 + rnd() * 30) {
+          for (var side2 = -1; side2 <= 1; side2 += 2) {
+            var lx = 5 + side2 * (95 + rnd() * 120), lw = 16 + rnd() * 26, drop = 25 + rnd() * 90, ld = 20 + rnd() * 26;
+            var lz = s2 * SQ2 + bo[2], ly = -s2 * SQ2 - drop + bo[1];
+            box(city, [Math.min(lx, lx + side2 * lw) + bo[0], ly - 90, lz], [Math.max(lx, lx + side2 * lw) + bo[0], ly, lz + ld], 90);
           }
         }
       }
@@ -182,13 +330,32 @@
       root.add(grp); groups.push(grp);
     }
   }
-  function box(acc, lo, hi) {
+  // A tower: roof, front and both sides, each wound to face outward (front faces only). Facades take
+  // the window tile per 10 m; the roof samples the tile's edge colour, dimmed, so tops read as solid
+  // lit slabs. Vertex colours tint each tower (mostly cyan-white, some violet, a few magenta) and fade
+  // it to black toward its foot, so the city sinks into the haze.
+  var TINTS = [[1, 1, 1], [1, 1, 1], [0.9, 1, 1], [0.78, 0.62, 1], [1, 0.62, 0.95]];
+  function box(acc, lo, hi, height) {
     var X = [lo[0], hi[0]], Y = [lo[1], hi[1]], Z = [lo[2], hi[2]];
-    function q(a, b, c, d, n) { acc.tri(a, b, c, n, "City", [0, 0, 0]); acc.tri(a, c, d, n, "City", [0, 0, 0]); }
-    q([X[0], Y[1], Z[0]], [X[1], Y[1], Z[0]], [X[1], Y[1], Z[1]], [X[0], Y[1], Z[1]], [0, 1, 0]);
-    q([X[0], Y[0], Z[0]], [X[1], Y[0], Z[0]], [X[1], Y[1], Z[0]], [X[0], Y[1], Z[0]], [0, 0, -1]);
-    q([X[0], Y[0], Z[0]], [X[0], Y[1], Z[0]], [X[0], Y[1], Z[1]], [X[0], Y[0], Z[1]], [-1, 0, 0]);
-    q([X[1], Y[0], Z[0]], [X[1], Y[1], Z[0]], [X[1], Y[1], Z[1]], [X[1], Y[0], Z[1]], [1, 0, 0]);
+    var t = TINTS[(rnd() * TINTS.length) | 0], top = Y[1];
+    if (!acc.c) acc.c = [];
+    function vtx(p, uv, k) { acc.p.push(p[0], p[1], -p[2]); acc.u.push(uv[0], uv[1]); acc.c.push(t[0] * k, t[1] * k, t[2] * k); }
+    function shade(y) { var f = 1 - (top - y) / height; return f * f; }
+    function q(a, b, c, d, n, uvf, roof) {
+      // three coords flip z; pick the winding whose normal points along n there
+      var A = [a[0], a[1], -a[2]], B = [b[0], b[1], -b[2]], C = [c[0], c[1], -c[2]];
+      var e1 = [B[0] - A[0], B[1] - A[1], B[2] - A[2]], e2 = [C[0] - A[0], C[1] - A[1], C[2] - A[2]];
+      var nx = e1[1] * e2[2] - e1[2] * e2[1], ny = e1[2] * e2[0] - e1[0] * e2[2], nz = e1[0] * e2[1] - e1[1] * e2[0];
+      var pts = nx * n[0] + ny * n[1] - nz * n[2] > 0 ? [a, b, c, d] : [a, d, c, b];
+      [[0, 1, 2], [0, 2, 3]].forEach(function (tr) {
+        tr.forEach(function (i) { var p = pts[i]; vtx(p, roof ? [0.005, 0.5] : uvf(p), roof ? 0.2 : shade(p[1])); });
+      });
+    }
+    var fz = function (p) { return [p[0] / 10, p[1] / 10]; }, fx = function (p) { return [p[2] / 10, p[1] / 10]; };
+    q([X[0], top, Z[0]], [X[1], top, Z[0]], [X[1], top, Z[1]], [X[0], top, Z[1]], [0, 1, 0], null, true);
+    q([X[0], Y[0], Z[0]], [X[1], Y[0], Z[0]], [X[1], top, Z[0]], [X[0], top, Z[0]], [0, 0, -1], fz);
+    q([X[0], Y[0], Z[0]], [X[0], top, Z[0]], [X[0], top, Z[1]], [X[0], Y[0], Z[1]], [-1, 0, 0], fx);
+    q([X[1], Y[0], Z[0]], [X[1], top, Z[0]], [X[1], top, Z[1]], [X[1], Y[0], Z[1]], [1, 0, 0], fx);
   }
   function disposeGroup(g) { g.traverse(function (n) { if (n.geometry) n.geometry.dispose(); }); root.remove(g); }
   function cullBehind(along) {
@@ -214,28 +381,73 @@
   }, true);
   texBall.repeat.set(6, 6);
   spin.add(new THREE.Mesh(new THREE.SphereGeometry(0.5, 36, 24), new THREE.MeshBasicMaterial({ map: texBall })));
-  var halo = new THREE.Mesh(new THREE.SphereGeometry(0.6, 24, 16), new THREE.MeshBasicMaterial({ color: 0x4acbe1, transparent: true, opacity: 0.13, blending: THREE.AdditiveBlending, depthWrite: false }));
+  // Soft glows are additive sprites with a radial gradient drawn in code: one behind the ball, one for
+  // the speed-up shockwave and one for the crash flash. No post-processing pass.
+  function glowTex(stops) {
+    return canvasTex(128, function (g, n) {
+      var r = g.createRadialGradient(n / 2, n / 2, 0, n / 2, n / 2, n / 2);
+      stops.forEach(function (s) { r.addColorStop(s[0], s[1]); });
+      g.fillStyle = r; g.fillRect(0, 0, n, n);
+    }, false);
+  }
+  function glowSprite(tex, color, opacity) {
+    // no depth test: a camera-facing quad at the ball would otherwise be cut off by the deck under it
+    var s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, color: color, transparent: true, opacity: opacity, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false, fog: false }));
+    return s;
+  }
+  var texGlow = glowTex([[0, "rgba(255,255,255,0.7)"], [0.3, "rgba(255,255,255,0.45)"], [0.55, "rgba(255,255,255,0.12)"], [1, "rgba(255,255,255,0)"]]);
+  var texRing = glowTex([[0, "rgba(255,255,255,0)"], [0.62, "rgba(255,255,255,0)"], [0.8, "rgba(255,255,255,0.9)"], [0.88, "rgba(255,255,255,0.35)"], [1, "rgba(255,255,255,0)"]]);
+  var halo = glowSprite(texGlow, 0x4acbe1, 0.5);
+  halo.scale.set(2.6, 2.6, 1); halo.renderOrder = -1;
   ballGroup.add(halo);
   ballGroup.add(spin); scene.add(ballGroup);
+  var ring = glowSprite(texRing, 0xfd85ef, 0); ring.visible = false; scene.add(ring);
+  var flash = glowSprite(texGlow, 0xff8cf0, 0); flash.visible = false; scene.add(flash);
+  var ringAge = 9, flashAge = 9;
+  function updateFx(dt) {
+    ringAge += dt; flashAge += dt;
+    ring.visible = ringAge < 0.7 && ballGroup.visible;
+    if (ring.visible) {
+      var u = ringAge / 0.7, s = 1.2 + u * 9;
+      ring.position.copy(ballGroup.position); ring.scale.set(s, s, 1); ring.material.opacity = 0.9 * (1 - u) * (1 - u);
+    }
+    flash.visible = flashAge < 0.6;
+    if (flash.visible) { var w = flashAge / 0.6, fs = 2 + w * 10; flash.scale.set(fs, fs, 1); flash.material.opacity = 0.95 * (1 - w) * (1 - w); }
+  }
+  // the screen-edge pulse in CSS (#fx), restarted on each event
+  var fxEl = $("fx");
+  function screenFx(kind) {
+    if (!fxEl) return;
+    fxEl.className = "fx"; void fxEl.offsetWidth; fxEl.className = "fx " + kind;
+  }
 
-  var TRAIL = 22, trailPts = [], trailPos = new Float32Array(TRAIL * 6), trailCol = new Float32Array(TRAIL * 6), idx = [];
+  var TRAIL = 22, trailPts = [], trailPos = new Float32Array(TRAIL * 6), trailCol = new Float32Array(TRAIL * 6), trailUV = new Float32Array(TRAIL * 4), idx = [];
   for (var ti = 0; ti < TRAIL; ti++) {
-    var f = Math.pow(1 - ti / TRAIL, 1.5);
-    for (var e2 = 0; e2 < 2; e2++) { var o3 = (ti * 2 + e2) * 3; trailCol[o3] = 0.41 * f; trailCol[o3 + 1] = f; trailCol[o3 + 2] = f; }
+    var f = Math.pow(1 - ti / TRAIL, 1.3), mg = ti / TRAIL;   // cyan at the ball, shading toward violet at the tail
+    for (var e2 = 0; e2 < 2; e2++) {
+      var o3 = (ti * 2 + e2) * 3; trailCol[o3] = (0.41 + 0.35 * mg) * f; trailCol[o3 + 1] = (1 - 0.55 * mg) * f; trailCol[o3 + 2] = f;
+      trailUV[(ti * 2 + e2) * 2] = e2; trailUV[(ti * 2 + e2) * 2 + 1] = 0.5;
+    }
     if (ti < TRAIL - 1) { var a = ti * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
   }
+  var texTrail = canvasTex(64, function (g, n) {   // bright core, soft edges across the ribbon
+    var l = g.createLinearGradient(0, 0, n, 0);
+    l.addColorStop(0, "#000"); l.addColorStop(0.3, "#4a4a4a"); l.addColorStop(0.5, "#fff"); l.addColorStop(0.7, "#4a4a4a"); l.addColorStop(1, "#000");
+    g.fillStyle = l; g.fillRect(0, 0, n, n);
+  }, false);
   var trailGeo = new THREE.BufferGeometry();
   trailGeo.setAttribute("position", new THREE.BufferAttribute(trailPos, 3));
   trailGeo.setAttribute("color", new THREE.BufferAttribute(trailCol, 3));
+  trailGeo.setAttribute("uv", new THREE.BufferAttribute(trailUV, 2));
   trailGeo.setIndex(idx);
-  var trail = new THREE.Mesh(trailGeo, new THREE.MeshBasicMaterial({ vertexColors: true, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: false }));
+  var trail = new THREE.Mesh(trailGeo, new THREE.MeshBasicMaterial({ map: texTrail, vertexColors: true, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: false }));
   trail.frustumCulled = false; scene.add(trail);
   function pushTrail(reset) {
     var pt = [ball.p[0], ball.p[1] - 0.35, -ball.p[2]];
     if (reset) { trailPts = []; for (var i = 0; i < TRAIL; i++) trailPts.push(pt); }
     else { trailPts.pop(); trailPts.unshift(pt); }
     for (var j = 0; j < TRAIL; j++) {
-      var p = trailPts[j], hw = 0.16 * (1 - j / TRAIL), o = j * 6;
+      var p = trailPts[j], hw = 0.3 * (1 - j / TRAIL), o = j * 6;
       trailPos[o] = p[0] - hw; trailPos[o + 1] = p[1]; trailPos[o + 2] = p[2];
       trailPos[o + 3] = p[0] + hw; trailPos[o + 4] = p[1]; trailPos[o + 5] = p[2];
     }
@@ -243,11 +455,22 @@
   }
 
   // The original's death: 23 magenta cubes thrown out with force 40, radius 15, upward modifier 2.
-  var SHARDS = 23, shards = new THREE.InstancedMesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), new THREE.MeshBasicMaterial({ color: 0xde79e7 }), SHARDS);
+  // Same count and throw; each cube wears a glowing-edge tile, tinted magenta, pink-white or (bits of
+  // the ball) cyan, so the burst reads as lit fragments rather than flat swatches.
+  var texShard = canvasTex(32, function (g, n) {
+    g.fillStyle = "#3a1240"; g.fillRect(0, 0, n, n);
+    g.strokeStyle = "#ffffff"; g.lineWidth = 6; g.strokeRect(0, 0, n, n);
+  }, false);
+  var SHARDS = 23, shards = new THREE.InstancedMesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), new THREE.MeshBasicMaterial({ map: texShard }), SHARDS);
+  (function () {
+    var tints = [0xff7fe6, 0xff7fe6, 0xde79e7, 0xffd6fb, 0x7fe9ff], c = new THREE.Color();
+    for (var i = 0; i < SHARDS; i++) shards.setColorAt(i, c.setHex(tints[i % tints.length]));
+  })();
   shards.visible = false; shards.frustumCulled = false; scene.add(shards);
   var shardV = [], shardP = [], shardAge = 0, tmpM = new THREE.Matrix4(), tmpQ = new THREE.Quaternion(), tmpE = new THREE.Euler(), tmpV = new THREE.Vector3(), tmpS = new THREE.Vector3();
   function shatter(x, y, z, vel) {
     shards.visible = true; shardAge = 0; shardV = []; shardP = [];
+    flash.position.set(x, y, -z); flashAge = 0; screenFx("crash");
     for (var i = 0; i < SHARDS; i++) {
       var th = Math.random() * Math.PI * 2, sp = 6 + Math.random() * 10;
       shardV.push([vel[0] * 0.3 + Math.cos(th) * sp, vel[1] * 0.3 + 4 + Math.random() * 8, vel[2] * 0.3 + Math.sin(th) * sp]);
@@ -269,17 +492,25 @@
     if (shardAge > 2) shards.visible = false;   // the original destroys the bits after 2 s
   }
 
-  var starGeo = new THREE.BufferGeometry(), sp = [];
-  for (var si = 0; si < 600; si++) {
-    var az = Math.random() * Math.PI * 2, el = Math.random() * 1.3 - 0.2, rr = 1500;
+  // Distant lights: the camera looks down, so most sit below the horizon (far city sparks in the haze),
+  // with a thinner spread of stars above. Mostly dim blue-white, some cyan and magenta.
+  var starGeo = new THREE.BufferGeometry(), sp = [], sc = [];
+  for (var si = 0; si < 900; si++) {
+    var az = Math.random() * Math.PI * 2, below = si < 650;
+    var el = below ? -Math.asin(Math.pow(Math.random(), 0.7) * 0.97) : Math.random() * 1.2, rr = 1500;
     sp.push(Math.cos(az) * Math.cos(el) * rr, Math.sin(el) * rr, Math.sin(az) * Math.cos(el) * rr);
+    var k = 0.25 + Math.pow(Math.random(), 3) * 0.75, h = Math.random();
+    var rgb = h < 0.14 ? [0.35, 0.85, 1] : h < 0.24 ? [1, 0.5, 0.92] : [0.62, 0.78, 0.88];
+    sc.push(rgb[0] * k, rgb[1] * k, rgb[2] * k);
   }
   starGeo.setAttribute("position", new THREE.Float32BufferAttribute(sp, 3));
-  var stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0x9fc8d8, size: 1.5, sizeAttenuation: false, fog: false }));
+  starGeo.setAttribute("color", new THREE.Float32BufferAttribute(sc, 3));
+  var stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ vertexColors: true, size: 1.8, sizeAttenuation: false, fog: false }));
+  stars.frustumCulled = false;
   scene.add(stars);
 
   // ---- audio: a small synth so there are no audio files to load -------------------------------
-  var audio = (function () {
+  audio = (function () {
     var ctx = null, master = null, musicGain = null, timer = null, nextT = 0, stepN = 0;
     var BPM = 118, STEP = 60 / BPM / 4;
     var BASS = [45, 45, 57, 45, 41, 41, 53, 41, 48, 48, 60, 48, 43, 43, 55, 43];
@@ -424,7 +655,7 @@
   });
 
   // ---- game flow ---------------------------------------------------------------------------------------
-  var state = "menu", acc = 0, hintTimer = 0, speedTimer = 0, shownScore = -1, overTimer = 0, runSeed = 0, seenSpeedUps = 0, landPulse = 0;
+  var acc = 0, hintTimer = 0, speedTimer = 0, shownScore = -1, runSeed = 0, seenSpeedUps = 0, landPulse = 0;
   function newWorld() {
     clearTrack();
     runSeed = (Math.random() * 4294967296) >>> 0;
@@ -432,7 +663,7 @@
     ball = new B.Ball(CFG);
     world.ensureAhead(ball);
     buildBlocks();
-    acc = 0; shards.visible = false; ballGroup.visible = true; seenSpeedUps = 0;
+    acc = 0; shards.visible = false; ballGroup.visible = true; seenSpeedUps = 0; ringAge = flashAge = 9;
     cam.reset(); pushTrail(true);
   }
   function setPlaying(on) {
@@ -441,7 +672,7 @@
     ui.arrowL.hidden = ui.arrowR.hidden = !on;
   }
   function showOnly(el) { [ui.menu, ui.board, ui.over, ui.paused].forEach(function (x) { x.hidden = x !== el; }); }
-  function showMenu() { state = "menu"; setPlaying(false); showOnly(ui.menu); audio.music(false); clearTimeout(overTimer); }
+  function showMenu() { state = "menu"; setPlaying(false); showOnly(ui.menu); if (audio) audio.music(false); clearTimeout(overTimer); }
   function startRun() {
     audio.unlock(); clearTimeout(overTimer);
     newWorld();
@@ -453,7 +684,7 @@
     canvas.focus({ preventScroll: true });
     last = performance.now();
   }
-  function pause() { state = "pause"; showOnly(ui.paused); audio.music(false); $("resumeBtn").focus({ preventScroll: true }); }
+  function pause() { state = "pause"; showOnly(ui.paused); ui.hint.style.opacity = "0"; audio.music(false); $("resumeBtn").focus({ preventScroll: true }); }
   function resume() { state = "play"; showOnly(null); audio.music(soundOn); last = performance.now(); canvas.focus({ preventScroll: true }); }
   function runRecord() { return { score: ball.score, dist: Math.max(0, Math.floor(W.along(ball.p))), t: +ball.t.toFixed(2), seed: runSeed }; }
   function gameOver() {
@@ -523,7 +754,7 @@
         }
         var fov = fovNow();
         if (Math.abs(camera.fov - fov) > 0.05) { camera.fov = fov; camera.updateProjectionMatrix(); }
-        stars.position.copy(camera.position);
+        stars.position.copy(camera.position); sky.position.copy(camera.position);
       }
     };
   })();
@@ -544,10 +775,10 @@
   function renderPrepass() {
     renderer.autoClear = false;
     renderer.clear();
-    // pass 1: depth of opaque geometry only (sky, stars, ball halo, trail and shards are left out)
+    // pass 1: depth of opaque geometry only (sky dome, stars, ball and its glows, trail and shards are left out)
     var bg = scene.background; scene.background = null;
     hidden.length = 0;
-    [stars, trail, ballGroup, shards].forEach(function (o) { if (o.visible) { o.visible = false; hidden.push(o); } });
+    [stars, sky, trail, ballGroup, shards, ring, flash].forEach(function (o) { if (o.visible) { o.visible = false; hidden.push(o); } });
     scene.overrideMaterial = depthOnly;
     renderer.render(scene, camera);
     scene.overrideMaterial = null; scene.background = bg;
@@ -581,10 +812,14 @@
       if (ball.touched && !wasTouched) { wasTouched = true; cam.touch(); }
       if (ball.speedUps > seenSpeedUps) {
         seenSpeedUps = ball.speedUps; cam.boost(); audio.sfx("speed");
+        ringAge = 0; screenFx("boost");
         ui.speedup.classList.add("on"); clearTimeout(speedTimer);
         speedTimer = setTimeout(function () { ui.speedup.classList.remove("on"); }, 1600);
       }
-      if (ball.score !== shownScore) { shownScore = ball.score; ui.score.textContent = shownScore; }
+      if (ball.score !== shownScore) {
+        if (shownScore >= 0 && ball.score > shownScore) { ui.score.classList.remove("bump"); void ui.score.offsetWidth; ui.score.classList.add("bump"); }
+        shownScore = ball.score; ui.score.textContent = shownScore;
+      }
       if (ball.dead) {
         acc = 0;
         if (ball.cause !== "fall") { shatter(ball.p[0], ball.p[1], ball.p[2], ball.v); ballGroup.visible = false; }
@@ -608,7 +843,7 @@
       var mv = movers[m], col = mv.userData.col, off = world.colOffset(col, ball.t), org = col.origin, go = mv.parent.position;
       mv.position.set(org[0] + off[0] - go.x, org[1] + off[1] - go.y, -(org[2] + off[2]) - go.z);
     }
-    updateShards(dt);
+    updateShards(dt); updateFx(dt);
     if (state !== "pause") cam.place(dt);
     cullBehind(W.along(ball.dead ? [0, camera.position.y, -camera.position.z] : ball.p));
     var tRender = performance.now();
@@ -616,94 +851,6 @@
     jsMs = jsMs * 0.95 + (tRender - tStart) * 0.05;
     adaptQuality(dt);
   }
-
-  // ---- scores on Bluesky -------------------------------------------------------------------------------
-  var scores = null;
-  function accept(v) {
-    // A run's score must fit its own distance and time. Not proof, but it drops nonsense.
-    if (!Number.isInteger(v.value) || v.value < 0 || v.value > 50000) return false;
-    var m = /dist=(\d+)\b.*\bt=([\d.]+)/.exec(v.detail || "");
-    if (!m) return false;
-    var dist = +m[1], t = +m[2];
-    if (!(t > 0) || dist > t * 400 + 100) return false;
-    return v.value <= dist / 35 + 3;
-  }
-  function detailOf(run) { return "seed=" + run.seed + " dist=" + run.dist + " t=" + run.t + " v=" + VERSION; }
-  function postedBest() { return scores && scores.did ? load("s3r-posted:" + scores.did, 0) : 0; }
-  function setStatus(text, cls, retry) {
-    ui.postStatus.textContent = text; ui.postStatus.className = "status" + (cls ? " " + cls : "");
-    if (retry) { var b = document.createElement("button"); b.type = "button"; b.textContent = "Try again"; b.addEventListener("click", retry); ui.postStatus.append(" ", b); }
-  }
-  function postRun(run, onDone) {
-    scores.post({ value: run.score, detail: detailOf(run) }).then(function () {
-      save("s3r-posted:" + scores.did, run.score);
-      if (pending && pending.score <= run.score) { pending = null; save("s3r-pending", null); }
-      onDone(null);
-    }, function (err) { onDone(err); });
-  }
-  function maybePost(run) {
-    if (run.score <= 0) return;
-    if (scores && scores.did) {
-      if (run.score <= postedBest()) return;
-      var attempt = function () {
-        setStatus("Posting to the leaderboard…");
-        postRun(run, function (err) { if (err) setStatus("Couldn't post: " + err.message, "err", attempt); else setStatus("New best posted to the leaderboard.", "ok"); });
-      };
-      attempt();
-    } else if (!pending || run.score > pending.score) {
-      if (best && best.score === run.score) { pending = run; save("s3r-pending", pending); }
-      if (scores && scores.enabled) setStatus("Sign in on the menu to post this score.");
-    }
-  }
-  function renderAuth() {
-    var on = !!(scores && scores.did);
-    ui.signedOut.hidden = on; ui.signedIn.hidden = !on;
-    if (on) ui.whoHandle.textContent = "@" + (scores.handle || scores.did);
-  }
-  function note(text, err) { ui.authNote.textContent = text || ""; ui.authNote.className = "note" + (err ? " err" : ""); }
-  function startScores() {
-    scores = window.NGScores({ site: SITE, game: GAME, accept: accept });
-    if (!scores.enabled) { ui.handle.disabled = true; $("signInBtn").disabled = true; note("Sign-in works on joshuashew.com."); return; }
-    scores.init().then(function (r) {
-      renderAuth();
-      if (r.did && pending && pending.score > postedBest()) {
-        note("Posting your best score…");
-        postRun(pending, function (err) { note(err ? "Couldn't post your best score: " + err.message : "Posted your best score: " + (best ? best.score : ""), !!err); });
-      }
-    }, function (err) { note("Bluesky sign-in is unavailable right now (" + err.message + ").", true); });
-  }
-  function doSignIn() {
-    if (!scores || !scores.enabled) return;
-    note("Opening Bluesky…");
-    scores.signIn(ui.handle.value).catch(function (err) { note(err.message, true); });
-  }
-  $("signInBtn").addEventListener("click", doSignIn);
-  ui.handle.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); doSignIn(); } });
-  $("signOutBtn").addEventListener("click", function () { scores.signOut().then(function () { renderAuth(); note(""); }); });
-  if (window.NGScores) startScores(); else window.addEventListener("ng-scores-ready", startScores, { once: true });
-
-  var boardCache = null;
-  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-  function renderBoard(rows) {
-    ui.boardRows.innerHTML = "";
-    var me = scores && scores.did;
-    rows.slice(0, 100).forEach(function (r, i) {
-      var li = document.createElement("li"); if (r.did === me) li.className = "me";
-      li.innerHTML = '<span class="n">' + (i + 1) + '</span><span class="h"><a href="https://bsky.app/profile/' + esc(r.did) + '" target="_blank" rel="noopener">@' + esc(r.handle) + '</a></span><span class="v">' + r.value + "</span>";
-      ui.boardRows.appendChild(li);
-    });
-    ui.boardNote.textContent = rows.length ? "" : "No scores yet. Sign in and finish a run to post the first one.";
-  }
-  function loadBoard(force) {
-    if (!scores) { ui.boardNote.textContent = "Loading…"; return; }
-    if (boardCache && !force && Date.now() - boardCache.at < 60000) { renderBoard(boardCache.rows); return; }
-    ui.boardNote.textContent = "Loading scores from Bluesky…"; ui.boardRows.innerHTML = "";
-    scores.board().then(function (rows) { boardCache = { at: Date.now(), rows: rows }; if (state === "board") renderBoard(rows); },
-      function (err) { ui.boardNote.textContent = "Couldn't load the leaderboard: " + err.message; });
-  }
-  $("boardBtn").addEventListener("click", function () { state = "board"; showOnly(ui.board); loadBoard(false); });
-  $("boardRefresh").addEventListener("click", function () { loadBoard(true); });
-  $("boardBack").addEventListener("click", showMenu);
 
   // ---- boot ---------------------------------------------------------------------------------------------
   newWorld();
