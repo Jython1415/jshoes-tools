@@ -5,7 +5,7 @@
   "redirect_uris": [
     "https://joshuashew.com/games/slope-3-remake/"
   ],
-  "scope": "atproto repo:com.joshuashew.games.score?action=create",
+  "scope": "atproto include:com.joshuashew.games.authScores",
   "grant_types": [
     "authorization_code",
     "refresh_token"
