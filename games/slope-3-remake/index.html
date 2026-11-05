@@ -293,7 +293,7 @@ body.immersive .screen { padding-top: calc(24px + env(safe-area-inset-top, 0px))
   // Release stamp: bump V on every change to any of these scripts. The .js files are cached for hours
   // while this page revalidates, so a new V makes every browser fetch the matching scripts.
   (function () {
-    var V = "2026-11-05a";
+    var V = "2026-11-05b";
     window.S3R_VERSION = V;
     ["blocks.js", "phys.js", "ball.js", "world.js", "cfg.js", "game.js"].forEach(function (f) {
       var s = document.createElement("script"); s.src = f + "?v=" + V; s.async = false;   // run in order

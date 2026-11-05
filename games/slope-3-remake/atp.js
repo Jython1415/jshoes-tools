@@ -3,6 +3,9 @@
 // the mino.mobi arcade's com.minomobi.lab.score. The board is read straight from the network:
 // the relay lists repos holding the collection, then each repo's records are read from its PDS.
 const NSID = "com.joshuashew.games.score";
+// The permission set (published as a com.atproto.lexicon.schema record in Joshua's repo, found through the DNS TXT
+// _lexicon.games.joshuashew.com) grants repo create on NSID; Bluesky's consent screen shows its title and detail.
+const SCOPE = "atproto include:com.joshuashew.games.authScores";
 const ORIGIN = "https://joshuashew.com";
 const CLIENT_ID = ORIGIN + "/oauth-client-metadata.json";
 const RELAY = "https://relay1.us-east.bsky.network";
@@ -50,7 +53,7 @@ export function createScores({ site, game, accept }) {
     const h = String(input || "").trim().replace(/^@/, "");
     if (!h) throw new Error("Enter your Bluesky handle");
     // Redirects to the player's Bluesky sign-in page; the promise only settles if that fails.
-    await client.signIn(h, { scope: "atproto repo:" + NSID + "?action=create" });
+    await client.signIn(h, { scope: SCOPE });
   }
 
   async function signOut() {
