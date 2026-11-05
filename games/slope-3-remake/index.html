@@ -107,6 +107,7 @@ body.playing .site-bar { display: none; }
 .linkish:hover { color: var(--ink); }
 .note { color: var(--muted); font-size: 13px; line-height: 1.5; min-height: 1.5em; margin: -10px 0 0; }
 .note.err { color: var(--pink); }
+.note.aside { margin: 10px 0 0; min-height: 0; }
 .menu-btns { display: grid; gap: 22px; }
 .more { justify-self: center; width: min(320px, 80%); }
 .corner { position: fixed; z-index: 25; }
@@ -241,6 +242,7 @@ body.immersive .screen { padding-top: calc(24px + env(safe-area-inset-top, 0px))
         <div class="slant field"><span><input id="handle" type="text" inputmode="email" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="..."></span></div>
         <button class="field-go" id="signInBtn" type="button">Sign in</button>
       </div>
+      <p class="note aside" id="authHint">You'll confirm on Bluesky's own page, then come right back here.</p>
     </div>
     <div id="signedIn" class="who" hidden><b id="whoHandle"></b><button class="linkish" id="signOutBtn" type="button">Sign out</button></div>
     <p class="note" id="authNote"></p>
@@ -291,7 +293,7 @@ body.immersive .screen { padding-top: calc(24px + env(safe-area-inset-top, 0px))
   // Release stamp: bump V on every change to any of these scripts. The .js files are cached for hours
   // while this page revalidates, so a new V makes every browser fetch the matching scripts.
   (function () {
-    var V = "2026-11-04b";
+    var V = "2026-11-05a";
     window.S3R_VERSION = V;
     ["blocks.js", "phys.js", "ball.js", "world.js", "cfg.js", "game.js"].forEach(function (f) {
       var s = document.createElement("script"); s.src = f + "?v=" + V; s.async = false;   // run in order

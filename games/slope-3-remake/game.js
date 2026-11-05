@@ -10,7 +10,7 @@
     score: $("score"), hint: $("hint"), speedup: $("speedup"), pauseBtn: $("pauseBtn"),
     arrowL: $("arrowL"), arrowR: $("arrowR"), sound: $("soundBtn"),
     menu: $("menu"), board: $("board"), over: $("over"), paused: $("paused"),
-    handle: $("handle"), signedOut: $("signedOut"), signedIn: $("signedIn"), whoHandle: $("whoHandle"), authNote: $("authNote"),
+    handle: $("handle"), signedOut: $("signedOut"), signedIn: $("signedIn"), whoHandle: $("whoHandle"), authNote: $("authNote"), authHint: $("authHint"),
     boardRows: $("boardRows"), boardNote: $("boardNote"),
     finalScore: $("finalScore"), finalBest: $("finalBest"), postStatus: $("postStatus")
   };
@@ -73,14 +73,14 @@
   }
   function startScores() {
     scores = window.NGScores({ site: SITE, game: GAME, accept: accept });
-    if (!scores.enabled) { ui.handle.disabled = true; $("signInBtn").disabled = true; note("Sign-in works on joshuashew.com."); return; }
+    if (!scores.enabled) { ui.handle.disabled = true; $("signInBtn").disabled = true; ui.authHint.hidden = true; note("Sign-in works on joshuashew.com."); return; }
     scores.init().then(function (r) {
       renderAuth();
       if (r.did && pending && pending.score > postedBest()) {
         note("Posting your best score…");
         postRun(pending, function (err) { note(err ? "Couldn't post your best score: " + err.message : "Posted your best score: " + (best ? best.score : ""), !!err); });
       }
-    }, function (err) { note("Bluesky sign-in is unavailable right now (" + err.message + ").", true); });
+    }, function (err) { ui.authHint.hidden = true; note("Bluesky sign-in is unavailable right now (" + err.message + ").", true); });
   }
   function doSignIn() {
     if (!scores || !scores.enabled) return;
