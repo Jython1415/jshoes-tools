@@ -9,6 +9,10 @@
   Content-Type: application/octet-stream
   Content-Disposition: attachment; filename="Relay Texts (Notification trigger).shortcut"
 
+/kit/shortcuts/send-approved-texts.shortcut
+  Content-Type: application/octet-stream
+  Content-Disposition: attachment; filename="Send Approved Texts.shortcut"
+
 # Forward Codes shortcuts (/forward-codes/). Source and signing: kit-ios forward-codes/README.md.
 /forward-codes/*
   X-Robots-Tag: noindex, nofollow
