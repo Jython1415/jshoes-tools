@@ -16,6 +16,14 @@
       "url": "https://joshuashew.com/kit/shortcuts/relay-texts-notification.shortcut?v=3",
       "utility": "relay-message",
       "version": 3
+    },
+    {
+      "id": "send-approved-texts",
+      "title": "Send Approved Texts",
+      "detail": "Sends a text from this phone after you approve it in Approvals. Turn its automation on after installing.",
+      "url": "https://joshuashew.com/kit/shortcuts/send-approved-texts.shortcut?v=1",
+      "utility": "approved-texts",
+      "version": 1
     }
   ]
 }
